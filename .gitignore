@@ -1,0 +1,88 @@
+# Visual Studio build artifacts
+bin/
+obj/
+out/
+
+# Visual Studio cache/options
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+# Entity Framework migrations
+**/Migrations/*.cs
+**/Migrations/*.Designer.cs
+
+# Database files
+*.mdf
+*.ldf
+*.ndf
+
+# User-specific files
+*.rsuser
+*.sln
+launchSettings.json
+
+# Rider
+.idea/
+*.sln.iml
+
+# Mac OS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# App settings với connection string thật (giữ template)
+# appsettings.Production.json
+# appsettings.Development.json
+
+# Logs
+*.log
+
+# Upload files (nếu có)
+wwwroot/uploads/
+wwwroot/posters/
+
+# Testing
+TestResults/
+*.trx
+
+# Progress tracking
+.push-progress.log
