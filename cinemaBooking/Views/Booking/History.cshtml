@@ -1,0 +1,78 @@
+@model List<cinemaBooking.Models.ViewModels.BookingHistoryItemViewModel>
+@{
+    ViewData["Title"] = "Lịch sử đặt vé";
+}
+
+<div class="container mt-4">
+    <h3 class="fw-bold mb-4"><i class="fas fa-history me-2 text-danger"></i>Lịch sử đặt vé</h3>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-ticket-alt fa-4x text-muted mb-3"></i>
+            <h5 class="text-muted">Bạn chưa có lịch sử đặt vé</h5>
+            <a asp-controller="Movie" asp-action="Index" class="btn btn-danger mt-3">Đặt vé ngay</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var b in Model)
+            {
+                var (statusBadge, statusText) = b.BookingStatus switch {
+                    "Confirmed" => ("bg-success", "Đã xác nhận"),
+                    "Cancelled" => ("bg-secondary", "Đã hủy"),
+                    "Completed" => ("bg-info", "Hoàn thành"),
+                    _ => ("bg-warning text-dark", "Đang chờ")
+                };
+                <div class="col-12">
+                    <div class="card @(b.BookingStatus == "Cancelled" ? "opacity-75" : "")">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                @if (!string.IsNullOrEmpty(b.MoviePoster))
+                                {
+                                    <div class="col-auto">
+                                        <img src="@b.MoviePoster" style="width:60px;height:85px;object-fit:cover" class="rounded" alt="@b.MovieTitle" />
+                                    </div>
+                                }
+                                <div class="col">
+                                    <h6 class="fw-bold mb-1">@b.MovieTitle</h6>
+                                    <p class="mb-1 text-muted small">
+                                        <i class="fas fa-calendar me-1"></i>@b.ShowtimeStart.ToString("HH:mm dd/MM/yyyy")
+                                        &nbsp;|&nbsp; <i class="fas fa-building me-1"></i>@b.CinemaName
+                                    </p>
+                                    <p class="mb-0 small">
+                                        Mã vé: <strong class="text-danger">@b.BookingCode</strong>
+                                        &nbsp;|&nbsp; @b.SeatCount ghế
+                                        &nbsp;|&nbsp; <strong>@b.TotalAmount.ToString("N0")đ</strong>
+                                    </p>
+                                </div>
+                                <div class="col-auto text-end">
+                                    <span class="badge @statusBadge mb-2">@statusText</span>
+                                    <br />
+                                    @if (b.PaymentStatus == "Pending")
+                                    {
+                                        <a asp-action="Confirmation" asp-route-id="@b.BookingId" class="btn btn-success btn-sm">Thanh toán</a>
+                                    }
+                                    else if (b.BookingStatus == "Confirmed")
+                                    {
+                                        <a asp-action="Confirmation" asp-route-id="@b.BookingId" class="btn btn-outline-secondary btn-sm">Xem vé</a>
+                                        <form asp-action="Cancel" asp-route-id="@b.BookingId" method="post" class="d-inline"
+                                              onsubmit="return confirm('Xác nhận hủy vé?')">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">Hủy</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="Confirmation" asp-route-id="@b.BookingId" class="btn btn-outline-secondary btn-sm">Chi tiết</a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

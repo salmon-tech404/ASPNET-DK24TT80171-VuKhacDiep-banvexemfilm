@@ -1,0 +1,177 @@
+@model cinemaBooking.Models.ViewModels.MovieDetailViewModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container mt-4">
+    <!-- Movie Header -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            @if (!string.IsNullOrEmpty(Model.PosterUrl))
+            {
+                <img src="@Model.PosterUrl" class="img-fluid rounded shadow" alt="@Model.Title" style="max-height:420px;width:100%;object-fit:cover;" />
+            }
+            else
+            {
+                <div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="height:400px">
+                    <i class="fas fa-film fa-5x text-white"></i>
+                </div>
+            }
+        </div>
+        <div class="col-md-9">
+            <h1 class="fw-bold">@Model.Title</h1>
+            @if (!string.IsNullOrEmpty(Model.OriginalTitle))
+            {
+                <p class="text-muted fst-italic">@Model.OriginalTitle</p>
+            }
+
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="badge bg-danger fs-6">@Model.AgeRating</span>
+                @{
+                    var (statusClass, statusText) = Model.Status switch {
+                        "NowShowing" => ("bg-success", "Đang chiếu"),
+                        "ComingSoon" => ("bg-warning text-dark", "Sắp chiếu"),
+                        _ => ("bg-secondary", "Đã kết thúc")
+                    };
+                }
+                <span class="badge @statusClass fs-6">@statusText</span>
+                @foreach (var genre in Model.Genres)
+                {
+                    <span class="badge bg-outline-secondary border text-dark">@genre</span>
+                }
+            </div>
+
+            <div class="row g-2 mb-3">
+                <div class="col-6 col-md-3">
+                    <div class="text-muted small">Thời lượng</div>
+                    <div class="fw-bold"><i class="fas fa-clock me-1 text-danger"></i>@Model.Duration phút</div>
+                </div>
+                @if (Model.Rating > 0)
+                {
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted small">Đánh giá</div>
+                        <div class="fw-bold"><i class="fas fa-star me-1 text-warning"></i>@Model.Rating.ToString("0.0")/10</div>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Language))
+                {
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted small">Ngôn ngữ</div>
+                        <div class="fw-bold">@Model.Language</div>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Country))
+                {
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted small">Quốc gia</div>
+                        <div class="fw-bold">@Model.Country</div>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Director))
+                {
+                    <div class="col-12 col-md-6">
+                        <div class="text-muted small">Đạo diễn</div>
+                        <div class="fw-bold">@Model.Director</div>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Cast))
+                {
+                    <div class="col-12">
+                        <div class="text-muted small">Diễn viên</div>
+                        <div>@Model.Cast</div>
+                    </div>
+                }
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <p>@Model.Description</p>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.TrailerUrl))
+            {
+                <a href="@Model.TrailerUrl" target="_blank" class="btn btn-outline-danger">
+                    <i class="fab fa-youtube me-2"></i>Xem trailer
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- Showtimes -->
+    @if (Model.Status == "NowShowing")
+    {
+        <div class="mb-4">
+            <h4 class="fw-bold mb-3"><i class="fas fa-calendar me-2 text-danger"></i>Lịch chiếu</h4>
+            <form asp-action="Details" asp-route-id="@Model.Id" method="get" class="mb-3">
+                <div class="input-group" style="max-width:260px">
+                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                    <input type="date" name="date" value="@ViewBag.SelectedDate" class="form-control" />
+                    <button type="submit" class="btn btn-outline-danger">Lọc</button>
+                </div>
+            </form>
+
+            @if (!Model.ShowtimeGroups.Any())
+            {
+                <div class="alert alert-info">Không có suất chiếu trong ngày này.</div>
+            }
+            else
+            {
+                @foreach (var group in Model.ShowtimeGroups)
+                {
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-building me-2 text-danger"></i>
+                            <strong>@group.CinemaName</strong>
+                            <span class="text-muted ms-2">@group.CinemaCity</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var st in group.Showtimes)
+                                {
+                                    var isAvailable = st.AvailableSeats > 0 && st.Status == "Scheduled";
+                                    <a asp-controller="Booking" asp-action="SeatSelection" asp-route-showtimeId="@st.Id"
+                                       class="btn @(isAvailable ? "btn-outline-danger" : "btn-outline-secondary") showtime-btn"
+                                       title="@st.RoomName | @st.AvailableSeats/@st.TotalSeats ghế">
+                                        <div class="fw-bold">@st.StartTime.ToString("HH:mm")</div>
+                                        <div class="small">@st.Format • @st.SubType</div>
+                                        <div class="small">@st.BasePrice.ToString("N0")đ</div>
+                                        @if (!isAvailable)
+                                        {
+                                            <div class="small text-muted">Hết ghế</div>
+                                        }
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    }
+    else if (Model.Status == "ComingSoon")
+    {
+        <div class="alert alert-warning">
+            <i class="fas fa-clock me-2"></i>Phim sắp chiếu
+            @if (Model.ReleaseDate.HasValue)
+            {
+                <strong> từ ngày @Model.ReleaseDate.Value.ToString("dd/MM/yyyy")</strong>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    @if (!User.Identity!.IsAuthenticated)
+    {
+        <script>
+            document.querySelectorAll('.showtime-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('Bạn cần đăng nhập để đặt vé. Đến trang đăng nhập?')) {
+                        window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                    }
+                });
+            });
+        </script>
+    }
+}

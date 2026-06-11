@@ -1,0 +1,62 @@
+@model cinemaBooking.Models.ViewModels.ShowtimeFormViewModel
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="MovieId" class="form-label">Phim *</label>
+        <select asp-for="MovieId" class="form-select">
+            <option value="">-- Chọn phim --</option>
+            @foreach (var m in Model.Movies)
+            {
+                <option value="@m.Id" selected="@(Model.MovieId == m.Id)">@m.Title</option>
+            }
+        </select>
+        <span asp-validation-for="MovieId" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="RoomId" class="form-label">Phòng chiếu *</label>
+        <select asp-for="RoomId" class="form-select">
+            <option value="">-- Chọn phòng --</option>
+            @foreach (var r in Model.Rooms)
+            {
+                <option value="@r.Id" selected="@(Model.RoomId == r.Id)">@r.CinemaName – @r.DisplayName</option>
+            }
+        </select>
+        <span asp-validation-for="RoomId" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="StartTime" class="form-label">Thời gian bắt đầu *</label>
+        <input asp-for="StartTime" class="form-control" type="datetime-local" />
+        <span asp-validation-for="StartTime" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="SubType" class="form-label">Phụ đề / Lồng tiếng</label>
+        <select asp-for="SubType" class="form-select">
+            <option value="Vietsub">Vietsub</option>
+            <option value="Dubbed">Lồng tiếng</option>
+            <option value="Original">Tiếng gốc</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Format" class="form-label">Định dạng</label>
+        <select asp-for="Format" class="form-select">
+            <option value="2D">2D</option>
+            <option value="3D">3D</option>
+            <option value="4DX">4DX</option>
+            <option value="IMAX">IMAX</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="BasePrice" class="form-label">Giá vé cơ bản (VNĐ) *</label>
+        <input asp-for="BasePrice" class="form-control" type="number" placeholder="85000" />
+        <span asp-validation-for="BasePrice" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Status" class="form-label">Trạng thái</label>
+        <select asp-for="Status" class="form-select">
+            <option value="Scheduled">Đã lên lịch</option>
+            <option value="Ongoing">Đang chiếu</option>
+            <option value="Completed">Hoàn thành</option>
+            <option value="Cancelled">Đã hủy</option>
+        </select>
+    </div>
+</div>

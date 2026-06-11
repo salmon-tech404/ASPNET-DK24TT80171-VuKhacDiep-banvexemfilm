@@ -1,0 +1,86 @@
+@model cinemaBooking.Models.ViewModels.BookingConfirmViewModel
+@{
+    ViewData["Title"] = "Xác nhận đặt vé";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow">
+                <div class="card-header text-center @(Model.BookingStatus == "Confirmed" ? "bg-success" : "bg-warning") text-white fw-bold">
+                    @if (Model.BookingStatus == "Confirmed")
+                    {
+                        <i class="fas fa-check-circle me-2"></i><span>Đặt vé thành công!</span>
+                    }
+                    else
+                    {
+                        <i class="fas fa-clock me-2"></i><span>Đang chờ thanh toán</span>
+                    }
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-3">
+                        @if (!string.IsNullOrEmpty(Model.MoviePoster))
+                        {
+                            <div class="col-3">
+                                <img src="@Model.MoviePoster" class="img-fluid rounded" alt="@Model.MovieTitle" />
+                            </div>
+                        }
+                        <div class="col">
+                            <h5 class="fw-bold">@Model.MovieTitle</h5>
+                            <p class="mb-1 text-muted">
+                                <i class="fas fa-clock me-1"></i>@Model.ShowtimeStart.ToString("HH:mm dd/MM/yyyy")
+                                &nbsp;|&nbsp; @Model.Format · @Model.SubType
+                            </p>
+                            <p class="mb-1 text-muted">
+                                <i class="fas fa-building me-1"></i>@Model.CinemaName · @Model.RoomName
+                            </p>
+                        </div>
+                    </div>
+
+                    <table class="table table-sm">
+                        <tr><td class="text-muted">Mã đặt vé</td><td><strong class="text-danger">@Model.BookingCode</strong></td></tr>
+                        <tr><td class="text-muted">Ghế ngồi</td><td>@string.Join(", ", Model.Seats)</td></tr>
+                        <tr><td class="text-muted">Tổng tiền</td><td><strong>@Model.TotalAmount.ToString("N0")đ</strong></td></tr>
+                        <tr>
+                            <td class="text-muted">Thanh toán</td>
+                            <td>
+                                @{
+                                    var (payBadge, payText) = Model.PaymentStatus switch {
+                                        "Success" => ("bg-success", "Đã thanh toán"),
+                                        "Pending" => ("bg-warning text-dark", "Chờ thanh toán"),
+                                        "Refunded" => ("bg-info", "Đã hoàn tiền"),
+                                        _ => ("bg-secondary", Model.PaymentStatus)
+                                    };
+                                }
+                                <span class="badge @payBadge">@payText</span>
+                                @if (Model.PaidAt.HasValue)
+                                {
+                                    <span class="text-muted small ms-2">@Model.PaidAt.Value.ToString("HH:mm dd/MM/yyyy")</span>
+                                }
+                            </td>
+                        </tr>
+                    </table>
+
+                    @if (Model.BookingStatus == "Pending" && Model.PaymentStatus == "Pending")
+                    {
+                        <form asp-action="Pay" asp-route-id="@Model.BookingId" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-success w-100 btn-lg mb-2">
+                                <i class="fas fa-credit-card me-2"></i>Thanh toán ngay (@Model.TotalAmount.ToString("N0")đ)
+                            </button>
+                        </form>
+                    }
+
+                    <div class="d-flex gap-2 mt-2">
+                        <a asp-action="History" class="btn btn-outline-secondary">
+                            <i class="fas fa-history me-1"></i>Lịch sử vé
+                        </a>
+                        <a asp-controller="Movie" asp-action="Index" class="btn btn-outline-danger">
+                            <i class="fas fa-film me-1"></i>Đặt thêm vé
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

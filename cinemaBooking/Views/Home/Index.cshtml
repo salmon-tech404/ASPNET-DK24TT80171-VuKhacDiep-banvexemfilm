@@ -1,0 +1,151 @@
+@model cinemaBooking.Models.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<!-- Hero -->
+<div class="hero-section text-white text-center py-5 mb-5">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-3"><i class="fas fa-film me-3"></i>Cinema Star</h1>
+        <p class="lead mb-4">Trải nghiệm điện ảnh đỉnh cao. Đặt vé nhanh – Chọn ghế dễ – Thanh toán tiện.</p>
+        <a asp-controller="Movie" asp-action="Index" class="btn btn-danger btn-lg me-3">
+            <i class="fas fa-play me-2"></i>Xem phim ngay
+        </a>
+        @if (!User.Identity!.IsAuthenticated)
+        {
+            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-light btn-lg">
+                Đăng ký tài khoản
+            </a>
+        }
+    </div>
+</div>
+
+<div class="container">
+    <!-- Now Showing -->
+    @if (Model.NowShowingMovies.Any())
+    {
+        <section class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold mb-0">
+                    <span class="border-start border-4 border-danger ps-3">Đang chiếu</span>
+                </h2>
+                <a asp-controller="Movie" asp-action="Index" asp-route-status="NowShowing" class="btn btn-outline-danger btn-sm">
+                    Xem tất cả <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="row g-3">
+                @foreach (var movie in Model.NowShowingMovies)
+                {
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="card movie-card h-100">
+                            <div class="movie-poster-wrap">
+                                @if (!string.IsNullOrEmpty(movie.PosterUrl))
+                                {
+                                    <img src="@movie.PosterUrl" class="card-img-top movie-poster" alt="@movie.Title" />
+                                }
+                                else
+                                {
+                                    <div class="movie-poster-placeholder"><i class="fas fa-film fa-3x text-muted"></i></div>
+                                }
+                                <span class="badge bg-danger age-badge">@movie.AgeRating</span>
+                            </div>
+                            <div class="card-body p-2">
+                                <h6 class="card-title text-truncate mb-1" title="@movie.Title">@movie.Title</h6>
+                                <p class="card-text small text-muted mb-1">
+                                    <i class="fas fa-clock me-1"></i>@movie.Duration phút
+                                    @if (movie.Rating > 0)
+                                    {
+                                        <span class="ms-2"><i class="fas fa-star text-warning me-1"></i>@movie.Rating.ToString("0.0")</span>
+                                    }
+                                </p>
+                                @if (movie.Genres.Any())
+                                {
+                                    <p class="small text-muted text-truncate mb-2">@string.Join(", ", movie.Genres.Take(2))</p>
+                                }
+                                <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.Id" class="btn btn-danger btn-sm w-100">
+                                    <i class="fas fa-ticket-alt me-1"></i>Đặt vé
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    <!-- Coming Soon -->
+    @if (Model.ComingSoonMovies.Any())
+    {
+        <section class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold mb-0">
+                    <span class="border-start border-4 border-warning ps-3">Sắp chiếu</span>
+                </h2>
+                <a asp-controller="Movie" asp-action="Index" asp-route-status="ComingSoon" class="btn btn-outline-warning btn-sm">
+                    Xem tất cả <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="row g-3">
+                @foreach (var movie in Model.ComingSoonMovies)
+                {
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="card movie-card h-100 opacity-90">
+                            <div class="movie-poster-wrap">
+                                @if (!string.IsNullOrEmpty(movie.PosterUrl))
+                                {
+                                    <img src="@movie.PosterUrl" class="card-img-top movie-poster" alt="@movie.Title" />
+                                }
+                                else
+                                {
+                                    <div class="movie-poster-placeholder"><i class="fas fa-film fa-3x text-muted"></i></div>
+                                }
+                                <span class="badge bg-warning text-dark age-badge">@movie.AgeRating</span>
+                                <div class="coming-soon-overlay"><span>Sắp chiếu</span></div>
+                            </div>
+                            <div class="card-body p-2">
+                                <h6 class="card-title text-truncate mb-1" title="@movie.Title">@movie.Title</h6>
+                                <p class="card-text small text-muted mb-1"><i class="fas fa-clock me-1"></i>@movie.Duration phút</p>
+                                @if (movie.ReleaseDate.HasValue)
+                                {
+                                    <p class="small text-warning mb-2"><i class="fas fa-calendar me-1"></i>@movie.ReleaseDate.Value.ToString("dd/MM/yyyy")</p>
+                                }
+                                <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.Id" class="btn btn-outline-warning btn-sm w-100">Chi tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    <!-- Why Cinema Star -->
+    <section class="py-5">
+        <h2 class="text-center fw-bold mb-4">Tại sao chọn Cinema Star?</h2>
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="p-4"><i class="fas fa-chair fa-3x text-danger mb-3"></i>
+                    <h5>Chọn ghế trực tiếp</h5>
+                    <p class="text-muted small">Xem sơ đồ phòng chiếu và chọn chỗ ngồi yêu thích</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-4"><i class="fas fa-bolt fa-3x text-warning mb-3"></i>
+                    <h5>Đặt vé siêu nhanh</h5>
+                    <p class="text-muted small">Chỉ mất vài bước để hoàn tất đặt vé</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-4"><i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
+                    <h5>Thanh toán an toàn</h5>
+                    <p class="text-muted small">Hỗ trợ nhiều phương thức thanh toán</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-4"><i class="fas fa-history fa-3x text-info mb-3"></i>
+                    <h5>Lịch sử đặt vé</h5>
+                    <p class="text-muted small">Quản lý tất cả vé đã đặt dễ dàng</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

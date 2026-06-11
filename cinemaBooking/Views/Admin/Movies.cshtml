@@ -1,0 +1,82 @@
+@model List<cinemaBooking.Models.ViewModels.MovieCardViewModel>
+@{
+    ViewData["Title"] = "Quản lý phim";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-2">@await Html.PartialAsync("_AdminSidebar")</div>
+        <div class="col-md-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0"><i class="fas fa-film me-2 text-danger"></i>Quản lý phim</h3>
+                <a asp-controller="Movie" asp-action="Create" class="btn btn-danger">
+                    <i class="fas fa-plus me-1"></i>Thêm phim
+                </a>
+            </div>
+
+            <form asp-action="Movies" method="get" class="row g-2 mb-3">
+                <div class="col-md-5">
+                    <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Tìm kiếm phim..." />
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">-- Tất cả --</option>
+                        <option value="NowShowing" selected="@(ViewBag.Status == "NowShowing")">Đang chiếu</option>
+                        <option value="ComingSoon" selected="@(ViewBag.Status == "ComingSoon")">Sắp chiếu</option>
+                        <option value="Ended" selected="@(ViewBag.Status == "Ended")">Đã kết thúc</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-outline-secondary w-100"><i class="fas fa-search me-1"></i>Lọc</button>
+                </div>
+            </form>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead><tr>
+                            <th>Poster</th><th>Tên phim</th><th>Thời lượng</th><th>Đánh giá</th><th>Trạng thái</th><th>Thao tác</th>
+                        </tr></thead>
+                        <tbody>
+                            @foreach (var m in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(m.PosterUrl))
+                                        {
+                                            <img src="@m.PosterUrl" style="width:40px;height:55px;object-fit:cover" class="rounded" />
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">@m.Title</div>
+                                        <div class="small text-muted">@string.Join(", ", m.Genres.Take(2))</div>
+                                    </td>
+                                    <td>@m.Duration phút</td>
+                                    <td>
+                                        @if (m.Rating > 0)
+                                        {
+                                            <i class="fas fa-star text-warning me-1"></i>@m.Rating.ToString("0.0")
+                                        }
+                                        else { <span class="text-muted">—</span> }
+                                    </td>
+                                    <td>
+                                        @{var (cls,txt) = m.Status switch {"NowShowing"=>("success","Đang chiếu"),"ComingSoon"=>("warning text-dark","Sắp chiếu"),_=>("secondary","Kết thúc")};}
+                                        <span class="badge bg-@cls">@txt</span>
+                                    </td>
+                                    <td>
+                                        <a asp-controller="Movie" asp-action="Edit" asp-route-id="@m.Id" class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-edit"></i></a>
+                                        <form asp-controller="Movie" asp-action="Delete" asp-route-id="@m.Id" method="post" class="d-inline"
+                                              onsubmit="return confirm('Xóa phim @m.Title?')">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

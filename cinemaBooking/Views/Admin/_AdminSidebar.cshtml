@@ -1,0 +1,28 @@
+<div class="admin-sidebar p-2">
+    <div class="list-group list-group-flush">
+        <a asp-controller="Admin" asp-action="Dashboard"
+           class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">
+            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+        </a>
+        <a asp-controller="Admin" asp-action="Movies"
+           class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["action"]?.ToString() == "Movies" ? "active" : "")">
+            <i class="fas fa-film me-2"></i>Phim
+        </a>
+        <a asp-controller="Admin" asp-action="Showtimes"
+           class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["action"]?.ToString() == "Showtimes" ? "active" : "")">
+            <i class="fas fa-calendar me-2"></i>Suất chiếu
+        </a>
+        <a asp-controller="Admin" asp-action="Bookings"
+           class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["action"]?.ToString() == "Bookings" ? "active" : "")">
+            <i class="fas fa-ticket-alt me-2"></i>Đơn đặt vé
+        </a>
+        <a asp-controller="Admin" asp-action="Cinemas"
+           class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["action"]?.ToString() == "Cinemas" ? "active" : "")">
+            <i class="fas fa-building me-2"></i>Rạp chiếu
+        </a>
+        <a asp-controller="Admin" asp-action="Users"
+           class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")">
+            <i class="fas fa-users me-2"></i>Người dùng
+        </a>
+    </div>
+</div>

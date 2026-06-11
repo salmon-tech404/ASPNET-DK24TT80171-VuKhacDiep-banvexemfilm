@@ -1,0 +1,90 @@
+@model cinemaBooking.Models.ViewModels.MovieListPageViewModel
+@{
+    ViewData["Title"] = "Danh sách phim";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4"><i class="fas fa-film me-2 text-danger"></i>Danh sách phim</h2>
+
+    <!-- Filter -->
+    <form asp-action="Index" method="get" class="row g-2 mb-4">
+        <div class="col-md-4">
+            <input type="text" name="search" value="@Model.SearchQuery" class="form-control" placeholder="Tìm kiếm phim..." />
+        </div>
+        <div class="col-md-3">
+            <select name="status" class="form-select">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="NowShowing" selected="@(Model.StatusFilter == "NowShowing")">Đang chiếu</option>
+                <option value="ComingSoon" selected="@(Model.StatusFilter == "ComingSoon")">Sắp chiếu</option>
+                <option value="Ended" selected="@(Model.StatusFilter == "Ended")">Đã kết thúc</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="genreId" class="form-select">
+                <option value="">-- Tất cả thể loại --</option>
+                @foreach (var genre in Model.Genres)
+                {
+                    <option value="@genre.Id" selected="@(Model.GenreFilter == genre.Id)">@genre.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-danger w-100"><i class="fas fa-search me-1"></i>Lọc</button>
+        </div>
+    </form>
+
+    @if (!Model.Movies.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-film fa-4x text-muted mb-3"></i>
+            <h5 class="text-muted">Không tìm thấy phim nào</h5>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var movie in Model.Movies)
+            {
+                var statusBadge = movie.Status switch {
+                    "NowShowing" => ("bg-success", "Đang chiếu"),
+                    "ComingSoon" => ("bg-warning text-dark", "Sắp chiếu"),
+                    _ => ("bg-secondary", "Kết thúc")
+                };
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card movie-card h-100">
+                        <div class="movie-poster-wrap">
+                            @if (!string.IsNullOrEmpty(movie.PosterUrl))
+                            {
+                                <img src="@movie.PosterUrl" class="card-img-top movie-poster" alt="@movie.Title" />
+                            }
+                            else
+                            {
+                                <div class="movie-poster-placeholder"><i class="fas fa-film fa-3x text-muted"></i></div>
+                            }
+                            <span class="badge bg-danger age-badge">@movie.AgeRating</span>
+                            <span class="badge @statusBadge.Item1 status-badge">@statusBadge.Item2</span>
+                        </div>
+                        <div class="card-body p-2">
+                            <h6 class="card-title text-truncate mb-1" title="@movie.Title">@movie.Title</h6>
+                            <p class="card-text small text-muted mb-1">
+                                <i class="fas fa-clock me-1"></i>@movie.Duration phút
+                                @if (movie.Rating > 0)
+                                {
+                                    <span class="ms-2"><i class="fas fa-star text-warning me-1"></i>@movie.Rating.ToString("0.0")</span>
+                                }
+                            </p>
+                            @if (movie.Genres.Any())
+                            {
+                                <p class="small text-muted text-truncate mb-2">@string.Join(", ", movie.Genres.Take(2))</p>
+                            }
+                            <a asp-action="Details" asp-route-id="@movie.Id" class="btn btn-sm @(movie.Status == "NowShowing" ? "btn-danger" : "btn-outline-secondary") w-100">
+                                @(movie.Status == "NowShowing" ? "Đặt vé" : "Chi tiết")
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <p class="text-muted mt-3 small">Tổng: <strong>@Model.Movies.Count</strong> phim</p>
+    }
+</div>

@@ -1,0 +1,89 @@
+@model cinemaBooking.Models.ViewModels.MovieFormViewModel
+
+<div class="row g-3">
+    <div class="col-md-8">
+        <label asp-for="Title" class="form-label">Tên phim *</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="OriginalTitle" class="form-label">Tên gốc</label>
+        <input asp-for="OriginalTitle" class="form-control" />
+    </div>
+    <div class="col-12">
+        <label asp-for="Description" class="form-label">Mô tả</label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Duration" class="form-label">Thời lượng (phút) *</label>
+        <input asp-for="Duration" class="form-control" type="number" />
+        <span asp-validation-for="Duration" class="text-danger small"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="ReleaseDate" class="form-label">Ngày khởi chiếu</label>
+        <input asp-for="ReleaseDate" class="form-control" type="date" />
+    </div>
+    <div class="col-md-3">
+        <label asp-for="EndDate" class="form-label">Ngày kết thúc</label>
+        <input asp-for="EndDate" class="form-control" type="date" />
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Rating" class="form-label">Điểm đánh giá (0-10)</label>
+        <input asp-for="Rating" class="form-control" type="number" step="0.1" />
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Language" class="form-label">Ngôn ngữ</label>
+        <input asp-for="Language" class="form-control" placeholder="Tiếng Việt" />
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Country" class="form-label">Quốc gia</label>
+        <input asp-for="Country" class="form-control" placeholder="Việt Nam" />
+    </div>
+    <div class="col-md-3">
+        <label asp-for="AgeRating" class="form-label">Giới hạn độ tuổi</label>
+        <select asp-for="AgeRating" class="form-select">
+            <option value="P">P (Mọi lứa tuổi)</option>
+            <option value="C13">C13 (Trên 13 tuổi)</option>
+            <option value="C16">C16 (Trên 16 tuổi)</option>
+            <option value="C18">C18 (Trên 18 tuổi)</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Status" class="form-label">Trạng thái</label>
+        <select asp-for="Status" class="form-select">
+            <option value="ComingSoon">Sắp chiếu</option>
+            <option value="NowShowing">Đang chiếu</option>
+            <option value="Ended">Đã kết thúc</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Director" class="form-label">Đạo diễn</label>
+        <input asp-for="Director" class="form-control" />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Cast" class="form-label">Diễn viên (cách nhau bằng dấu phẩy)</label>
+        <input asp-for="Cast" class="form-control" />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="PosterUrl" class="form-label">URL Poster phim</label>
+        <input asp-for="PosterUrl" class="form-control" placeholder="https://..." />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="TrailerUrl" class="form-label">URL Trailer (YouTube)</label>
+        <input asp-for="TrailerUrl" class="form-control" placeholder="https://youtube.com/..." />
+    </div>
+    <div class="col-12">
+        <label class="form-label">Thể loại</label>
+        <div class="d-flex flex-wrap gap-3">
+            @for (int i = 0; i < Model.AllGenres.Count; i++)
+            {
+                <div class="form-check">
+                    <input type="checkbox" name="SelectedGenreIds" value="@Model.AllGenres[i].Id"
+                           id="genre_@Model.AllGenres[i].Id" class="form-check-input"
+                           @(Model.AllGenres[i].IsChecked ? "checked" : "") />
+                    <label for="genre_@Model.AllGenres[i].Id" class="form-check-label">@Model.AllGenres[i].Name</label>
+                </div>
+            }
+        </div>
+    </div>
+</div>
