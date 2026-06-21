@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace cinemaBooking.Controllers;
 
 [Authorize(Roles = "Admin")]
+[Route("quan-tri")]
 public class AdminController : Controller
 {
     private readonly IUserService _userService;
@@ -29,44 +30,46 @@ public class AdminController : Controller
         _context = context;
     }
 
+    [Route("bang-dieu-khien")]
     public async Task<IActionResult> Dashboard()
     {
         var allBookings = await _bookingService.GetAllBookingsAsync();
-        var confirmedBookings = allBookings.Where(b => b.BookingStatus == "Confirmed").ToList();
+        var confirmedBookings = allBookings.Where(b => b.TrangThaiDat == "Confirmed").ToList();
 
         var topMovies = confirmedBookings
-            .GroupBy(b => b.MovieTitle)
+            .GroupBy(b => b.TenPhim)
             .OrderByDescending(g => g.Count())
             .Take(5)
             .Select(g => new TopMovieViewModel
             {
-                Title = g.Key,
-                BookingCount = g.Count(),
-                Revenue = g.Sum(b => b.TotalAmount)
+                TenPhim = g.Key,
+                SoLuongDatVe = g.Count(),
+                DoanhThu = g.Sum(b => b.TongTien)
             }).ToList();
 
         var vm = new AdminDashboardViewModel
         {
-            TotalMovies = await _context.Movies.CountAsync(),
-            NowShowingMovies = await _context.Movies.CountAsync(m => m.Status == "NowShowing"),
-            TotalUsers = await _context.Users.CountAsync(u => u.Role != "Admin"),
-            TotalBookings = allBookings.Count,
-            PendingBookings = allBookings.Count(b => b.BookingStatus == "Pending"),
-            TotalRevenue = confirmedBookings.Sum(b => b.TotalAmount),
-            RecentBookings = allBookings.Take(10).Select(b => new RecentBookingViewModel
+            TongSoPhim = await _context.Phim.CountAsync(),
+            PhimDangChieu = await _context.Phim.CountAsync(m => m.TrangThaiChieu == "NowShowing"),
+            TongSoNguoiDung = await _context.NguoiDung.CountAsync(u => u.VaiTro != "Admin"),
+            TongSoDatVe = allBookings.Count,
+            DatVePending = allBookings.Count(b => b.TrangThaiDat == "Pending"),
+            TongDoanhThu = confirmedBookings.Sum(b => b.TongTien),
+            DanhSachDatVeGanDay = allBookings.Take(10).Select(b => new RecentBookingViewModel
             {
-                Id = b.BookingId,
-                BookingCode = b.BookingCode,
-                MovieTitle = b.MovieTitle,
-                TotalAmount = b.TotalAmount,
-                Status = b.BookingStatus,
-                CreatedAt = b.CreatedAt
+                Id = b.MaDatVe,
+                MaGiaoDich = b.MaGiaoDich,
+                TenPhim = b.TenPhim,
+                TongTien = b.TongTien,
+                TrangThai = b.TrangThaiDat,
+                NgayTao = b.NgayTao
             }).ToList(),
-            TopMovies = topMovies
+            DanhSachPhimTop = topMovies
         };
         return View(vm);
     }
 
+    [Route("nguoi-dung")]
     public async Task<IActionResult> Users(string? search, string? role)
     {
         var users = await _userService.GetAllUsersAsync(search, role);
@@ -77,6 +80,7 @@ public class AdminController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("trang-thai-nguoi-dung/{id}")]
     public async Task<IActionResult> ToggleUserStatus(int id)
     {
         await _userService.ToggleUserActiveAsync(id);
@@ -86,6 +90,7 @@ public class AdminController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("doi-vai-tro-nguoi-dung/{id}")]
     public async Task<IActionResult> ChangeUserRole(int id, string role)
     {
         await _userService.ChangeUserRoleAsync(id, role);
@@ -93,6 +98,7 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Users));
     }
 
+    [Route("phim")]
     public async Task<IActionResult> Movies(string? search, string? status)
     {
         var movies = await _movieService.GetMoviesAsync(search, status);
@@ -101,6 +107,7 @@ public class AdminController : Controller
         return View(movies);
     }
 
+    [Route("suat-chieu")]
     public async Task<IActionResult> Showtimes()
     {
         var showtimes = await _showtimeService.GetAllShowtimesAsync();
@@ -108,6 +115,7 @@ public class AdminController : Controller
     }
 
     [HttpGet]
+    [Route("them-suat-chieu")]
     public async Task<IActionResult> CreateShowtime()
     {
         var vm = await _showtimeService.GetShowtimeFormAsync();
@@ -116,13 +124,14 @@ public class AdminController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("them-suat-chieu")]
     public async Task<IActionResult> CreateShowtime(ShowtimeFormViewModel model)
     {
         if (!ModelState.IsValid)
         {
             var freshVm = await _showtimeService.GetShowtimeFormAsync();
-            model.Movies = freshVm.Movies;
-            model.Rooms = freshVm.Rooms;
+            model.Phims = freshVm.Phims;
+            model.Phongs = freshVm.Phongs;
             return View(model);
         }
 
@@ -132,6 +141,7 @@ public class AdminController : Controller
     }
 
     [HttpGet]
+    [Route("sua-suat-chieu/{id}")]
     public async Task<IActionResult> EditShowtime(int id)
     {
         var vm = await _showtimeService.GetShowtimeFormAsync(id);
@@ -141,13 +151,14 @@ public class AdminController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("sua-suat-chieu/{id}")]
     public async Task<IActionResult> EditShowtime(int id, ShowtimeFormViewModel model)
     {
         if (!ModelState.IsValid)
         {
             var freshVm = await _showtimeService.GetShowtimeFormAsync();
-            model.Movies = freshVm.Movies;
-            model.Rooms = freshVm.Rooms;
+            model.Phims = freshVm.Phims;
+            model.Phongs = freshVm.Phongs;
             return View(model);
         }
 
@@ -158,6 +169,7 @@ public class AdminController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("xoa-suat-chieu/{id}")]
     public async Task<IActionResult> DeleteShowtime(int id)
     {
         await _showtimeService.DeleteShowtimeAsync(id);
@@ -165,6 +177,7 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Showtimes));
     }
 
+    [Route("dat-ve")]
     public async Task<IActionResult> Bookings(string? status)
     {
         var bookings = await _bookingService.GetAllBookingsAsync(status);
@@ -172,6 +185,7 @@ public class AdminController : Controller
         return View(bookings);
     }
 
+    [Route("rap-chieu")]
     public async Task<IActionResult> Cinemas()
     {
         var cinemas = await _cinemaService.GetAllCinemasAsync();

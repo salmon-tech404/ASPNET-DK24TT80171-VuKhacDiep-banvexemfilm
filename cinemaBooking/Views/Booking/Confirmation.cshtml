@@ -7,8 +7,8 @@
     <div class="row justify-content-center">
         <div class="col-md-7">
             <div class="card shadow">
-                <div class="card-header text-center @(Model.BookingStatus == "Confirmed" ? "bg-success" : "bg-warning") text-white fw-bold">
-                    @if (Model.BookingStatus == "Confirmed")
+                <div class="card-header text-center @(Model.TrangThaiDat == "Confirmed" ? "bg-success" : "bg-warning") text-white fw-bold">
+                    @if (Model.TrangThaiDat == "Confirmed")
                     {
                         <i class="fas fa-check-circle me-2"></i><span>Đặt vé thành công!</span>
                     }
@@ -19,54 +19,54 @@
                 </div>
                 <div class="card-body p-4">
                     <div class="row mb-3">
-                        @if (!string.IsNullOrEmpty(Model.MoviePoster))
+                        @if (!string.IsNullOrEmpty(Model.AnhPoster))
                         {
                             <div class="col-3">
-                                <img src="@Model.MoviePoster" class="img-fluid rounded" alt="@Model.MovieTitle" />
+                                <img src="@Model.AnhPoster" class="img-fluid rounded" alt="@Model.TenPhim" />
                             </div>
                         }
                         <div class="col">
-                            <h5 class="fw-bold">@Model.MovieTitle</h5>
+                            <h5 class="fw-bold">@Model.TenPhim</h5>
                             <p class="mb-1 text-muted">
-                                <i class="fas fa-clock me-1"></i>@Model.ShowtimeStart.ToString("HH:mm dd/MM/yyyy")
-                                &nbsp;|&nbsp; @Model.Format · @Model.SubType
+                                <i class="fas fa-clock me-1"></i>@Model.GioBatDau.ToString("HH:mm dd/MM/yyyy")
+                                &nbsp;|&nbsp; @Model.DinhDang · @Model.PhongDich
                             </p>
                             <p class="mb-1 text-muted">
-                                <i class="fas fa-building me-1"></i>@Model.CinemaName · @Model.RoomName
+                                <i class="fas fa-building me-1"></i>@Model.TenRap · @Model.TenPhong
                             </p>
                         </div>
                     </div>
 
                     <table class="table table-sm">
-                        <tr><td class="text-muted">Mã đặt vé</td><td><strong class="text-danger">@Model.BookingCode</strong></td></tr>
-                        <tr><td class="text-muted">Ghế ngồi</td><td>@string.Join(", ", Model.Seats)</td></tr>
-                        <tr><td class="text-muted">Tổng tiền</td><td><strong>@Model.TotalAmount.ToString("N0")đ</strong></td></tr>
+                        <tr><td class="text-muted">Mã đặt vé</td><td><strong class="text-danger">@Model.MaGiaoDich</strong></td></tr>
+                        <tr><td class="text-muted">Ghế ngồi</td><td>@string.Join(", ", Model.DanhSachGhe)</td></tr>
+                        <tr><td class="text-muted">Tổng tiền</td><td><strong>@Model.TongTien.ToString("N0")đ</strong></td></tr>
                         <tr>
                             <td class="text-muted">Thanh toán</td>
                             <td>
                                 @{
-                                    var (payBadge, payText) = Model.PaymentStatus switch {
+                                    var (payBadge, payText) = Model.TrangThaiThanhToan switch {
                                         "Success" => ("bg-success", "Đã thanh toán"),
                                         "Pending" => ("bg-warning text-dark", "Chờ thanh toán"),
                                         "Refunded" => ("bg-info", "Đã hoàn tiền"),
-                                        _ => ("bg-secondary", Model.PaymentStatus)
+                                        _ => ("bg-secondary", Model.TrangThaiThanhToan)
                                     };
                                 }
                                 <span class="badge @payBadge">@payText</span>
-                                @if (Model.PaidAt.HasValue)
+                                @if (Model.NgayThanhToan.HasValue)
                                 {
-                                    <span class="text-muted small ms-2">@Model.PaidAt.Value.ToString("HH:mm dd/MM/yyyy")</span>
+                                    <span class="text-muted small ms-2">@Model.NgayThanhToan.Value.ToString("HH:mm dd/MM/yyyy")</span>
                                 }
                             </td>
                         </tr>
                     </table>
 
-                    @if (Model.BookingStatus == "Pending" && Model.PaymentStatus == "Pending")
+                    @if (Model.TrangThaiDat == "Pending" && Model.TrangThaiThanhToan == "Pending")
                     {
-                        <form asp-action="Pay" asp-route-id="@Model.BookingId" method="post">
+                        <form asp-action="Pay" asp-route-id="@Model.MaDatVe" method="post">
                             @Html.AntiForgeryToken()
                             <button type="submit" class="btn btn-success w-100 btn-lg mb-2">
-                                <i class="fas fa-credit-card me-2"></i>Thanh toán ngay (@Model.TotalAmount.ToString("N0")đ)
+                                <i class="fas fa-credit-card me-2"></i>Thanh toán ngay (@Model.TongTien.ToString("N0")đ)
                             </button>
                         </form>
                     }

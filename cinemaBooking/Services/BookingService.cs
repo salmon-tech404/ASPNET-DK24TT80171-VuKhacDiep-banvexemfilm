@@ -14,62 +14,62 @@ public class BookingService : IBookingService
 
     public async Task<BookingConfirmViewModel?> CreateBookingAsync(int userId, CreateBookingViewModel model)
     {
-        var showtime = await _context.Showtimes
-            .Include(s => s.Movie)
-            .Include(s => s.Room).ThenInclude(r => r.Cinema)
-            .FirstOrDefaultAsync(s => s.Id == model.ShowtimeId);
+        var showtime = await _context.SuatChieu
+            .Include(s => s.Phim)
+            .Include(s => s.PhongChieu).ThenInclude(r => r.RapChieu)
+            .FirstOrDefaultAsync(s => s.Id == model.MaSuatChieu);
 
         if (showtime == null) return null;
 
         // Check seats belong to the showtime's room and are not booked
-        var bookedSeatIds = (await _context.BookingSeats
-            .Include(bs => bs.Booking)
-            .Where(bs => bs.Booking.ShowtimeId == model.ShowtimeId && bs.Booking.Status != "Cancelled")
-            .Select(bs => bs.SeatId)
+        var bookedSeatIds = (await _context.ChiTietGheDat
+            .Include(bs => bs.DatVe)
+            .Where(bs => bs.DatVe.MaSuatChieu == model.MaSuatChieu && bs.DatVe.TrangThaiDat != "Cancelled")
+            .Select(bs => bs.MaGhe)
             .ToListAsync())
             .ToHashSet();
 
-        var seats = await _context.Seats
-            .Where(s => model.SelectedSeatIds.Contains(s.Id) && s.RoomId == showtime.RoomId && s.IsActive)
+        var seats = await _context.GheNgoi
+            .Where(s => model.DanhSachMaGheChon.Contains(s.Id) && s.MaPhong == showtime.MaPhong && s.TrangThai)
             .ToListAsync();
 
-        if (seats.Count != model.SelectedSeatIds.Count) return null;
+        if (seats.Count != model.DanhSachMaGheChon.Count) return null;
         if (seats.Any(s => bookedSeatIds.Contains(s.Id))) return null;
 
         decimal total = 0;
         var bookingSeats = seats.Select(s =>
         {
-            var price = CalculateSeatPrice(showtime.BasePrice, s.SeatType, showtime.Format);
+            var price = CalculateSeatPrice(showtime.GiaVeCoBan, s.LoaiGhe, showtime.DinhDang);
             total += price;
-            return new BookingSeat { SeatId = s.Id, Price = price };
+            return new ChiTietGheDat { MaGhe = s.Id, GiaVeThucTe = price };
         }).ToList();
 
-        var booking = new Booking
+        var booking = new DatVe
         {
-            BookingCode = GenerateBookingCode(),
-            UserId = userId,
-            ShowtimeId = model.ShowtimeId,
-            TotalAmount = total,
-            Status = "Pending",
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
+            MaGiaoDich = GenerateBookingCode(),
+            MaNguoiDung = userId,
+            MaSuatChieu = model.MaSuatChieu,
+            TongTien = total,
+            TrangThaiDat = "Pending",
+            NgayDat = DateTime.Now,
+            NgayCapNhat = DateTime.Now
         };
-        _context.Bookings.Add(booking);
+        _context.DatVe.Add(booking);
         await _context.SaveChangesAsync();
 
         foreach (var bs in bookingSeats)
         {
-            bs.BookingId = booking.Id;
-            _context.BookingSeats.Add(bs);
+            bs.MaDatVe = booking.Id;
+            _context.ChiTietGheDat.Add(bs);
         }
 
-        _context.Payments.Add(new Payment
+        _context.ThanhToan.Add(new ThanhToan
         {
-            BookingId = booking.Id,
-            Method = model.PaymentMethod,
-            Amount = total,
-            Status = "Pending",
-            CreatedAt = DateTime.Now
+            MaDatVe = booking.Id,
+            PhuongThuc = model.PhuongThucThanhToan,
+            SoTien = total,
+            TrangThaiThanhToan = "Pending",
+            NgayTao = DateTime.Now
         });
         await _context.SaveChangesAsync();
 
@@ -78,20 +78,20 @@ public class BookingService : IBookingService
 
     public async Task<bool> ProcessPaymentAsync(int bookingId, int userId)
     {
-        var booking = await _context.Bookings
-            .Include(b => b.Payment)
-            .FirstOrDefaultAsync(b => b.Id == bookingId && b.UserId == userId);
+        var booking = await _context.DatVe
+            .Include(b => b.ThanhToan)
+            .FirstOrDefaultAsync(b => b.Id == bookingId && b.MaNguoiDung == userId);
 
-        if (booking == null || booking.Status != "Pending") return false;
+        if (booking == null || booking.TrangThaiDat != "Pending") return false;
 
-        booking.Status = "Confirmed";
-        booking.UpdatedAt = DateTime.Now;
+        booking.TrangThaiDat = "Confirmed";
+        booking.NgayCapNhat = DateTime.Now;
 
-        if (booking.Payment != null)
+        if (booking.ThanhToan != null)
         {
-            booking.Payment.Status = "Success";
-            booking.Payment.TransactionCode = "TXN" + booking.BookingCode;
-            booking.Payment.PaidAt = DateTime.Now;
+            booking.ThanhToan.TrangThaiThanhToan = "Success";
+            booking.ThanhToan.MaGiaoDichNganHang = "TXN" + booking.MaGiaoDich;
+            booking.ThanhToan.NgayThanhToan = DateTime.Now;
         }
 
         await _context.SaveChangesAsync();
@@ -100,106 +100,106 @@ public class BookingService : IBookingService
 
     public async Task<BookingConfirmViewModel?> GetBookingDetailAsync(int bookingId, int userId)
     {
-        var booking = await _context.Bookings
-            .Include(b => b.Showtime).ThenInclude(s => s.Movie)
-            .Include(b => b.Showtime).ThenInclude(s => s.Room).ThenInclude(r => r.Cinema)
-            .Include(b => b.BookingSeats).ThenInclude(bs => bs.Seat)
-            .Include(b => b.Payment)
-            .FirstOrDefaultAsync(b => b.Id == bookingId && b.UserId == userId);
+        var booking = await _context.DatVe
+            .Include(b => b.SuatChieu).ThenInclude(s => s.Phim)
+            .Include(b => b.SuatChieu).ThenInclude(s => s.PhongChieu).ThenInclude(r => r.RapChieu)
+            .Include(b => b.ChiTietGheDats).ThenInclude(bs => bs.GheNgoi)
+            .Include(b => b.ThanhToan)
+            .FirstOrDefaultAsync(b => b.Id == bookingId && b.MaNguoiDung == userId);
 
         if (booking == null) return null;
 
         return new BookingConfirmViewModel
         {
-            BookingId = booking.Id,
-            BookingCode = booking.BookingCode,
-            MovieTitle = booking.Showtime.Movie.Title,
-            MoviePoster = booking.Showtime.Movie.PosterUrl,
-            ShowtimeStart = booking.Showtime.StartTime,
-            Format = booking.Showtime.Format,
-            SubType = booking.Showtime.SubType,
-            CinemaName = booking.Showtime.Room.Cinema.Name,
-            RoomName = booking.Showtime.Room.Name,
-            Seats = booking.BookingSeats.Select(bs => $"{bs.Seat.RowLabel}{bs.Seat.SeatNumber} ({bs.Seat.SeatType})").ToList(),
-            TotalAmount = booking.TotalAmount,
-            BookingStatus = booking.Status,
-            PaymentStatus = booking.Payment?.Status ?? "Pending",
-            PaymentMethod = booking.Payment?.Method ?? "Mock",
-            PaidAt = booking.Payment?.PaidAt
+            MaDatVe = booking.Id,
+            MaGiaoDich = booking.MaGiaoDich,
+            TenPhim = booking.SuatChieu.Phim.TenPhim,
+            AnhPoster = booking.SuatChieu.Phim.AnhPoster,
+            GioBatDau = booking.SuatChieu.GioBatDau,
+            DinhDang = booking.SuatChieu.DinhDang,
+            PhongDich = booking.SuatChieu.PhongDich,
+            TenRap = booking.SuatChieu.PhongChieu.RapChieu.TenRap,
+            TenPhong = booking.SuatChieu.PhongChieu.TenPhong,
+            DanhSachGhe = booking.ChiTietGheDats.Select(bs => $"{bs.GheNgoi.HangGhe}{bs.GheNgoi.SoGhe} ({bs.GheNgoi.LoaiGhe})").ToList(),
+            TongTien = booking.TongTien,
+            TrangThaiDat = booking.TrangThaiDat,
+            TrangThaiThanhToan = booking.ThanhToan?.TrangThaiThanhToan ?? "Pending",
+            PhuongThucThanhToan = booking.ThanhToan?.PhuongThuc ?? "Mock",
+            NgayThanhToan = booking.ThanhToan?.NgayThanhToan
         };
     }
 
     public async Task<List<BookingHistoryItemViewModel>> GetUserBookingsAsync(int userId)
     {
-        return await _context.Bookings
-            .Include(b => b.Showtime).ThenInclude(s => s.Movie)
-            .Include(b => b.Showtime).ThenInclude(s => s.Room).ThenInclude(r => r.Cinema)
-            .Include(b => b.BookingSeats)
-            .Include(b => b.Payment)
-            .Where(b => b.UserId == userId)
-            .OrderByDescending(b => b.CreatedAt)
+        return await _context.DatVe
+            .Include(b => b.SuatChieu).ThenInclude(s => s.Phim)
+            .Include(b => b.SuatChieu).ThenInclude(s => s.PhongChieu).ThenInclude(r => r.RapChieu)
+            .Include(b => b.ChiTietGheDats)
+            .Include(b => b.ThanhToan)
+            .Where(b => b.MaNguoiDung == userId)
+            .OrderByDescending(b => b.NgayDat)
             .Select(b => new BookingHistoryItemViewModel
             {
-                BookingId = b.Id,
-                BookingCode = b.BookingCode,
-                MovieTitle = b.Showtime.Movie.Title,
-                MoviePoster = b.Showtime.Movie.PosterUrl,
-                ShowtimeStart = b.Showtime.StartTime,
-                CinemaName = b.Showtime.Room.Cinema.Name,
-                SeatCount = b.BookingSeats.Count,
-                TotalAmount = b.TotalAmount,
-                BookingStatus = b.Status,
-                PaymentStatus = b.Payment != null ? b.Payment.Status : "Pending",
-                CreatedAt = b.CreatedAt
+                MaDatVe = b.Id,
+                MaGiaoDich = b.MaGiaoDich,
+                TenPhim = b.SuatChieu.Phim.TenPhim,
+                AnhPoster = b.SuatChieu.Phim.AnhPoster,
+                GioBatDau = b.SuatChieu.GioBatDau,
+                TenRap = b.SuatChieu.PhongChieu.RapChieu.TenRap,
+                SoLuongGhe = b.ChiTietGheDats.Count,
+                TongTien = b.TongTien,
+                TrangThaiDat = b.TrangThaiDat,
+                TrangThaiThanhToan = b.ThanhToan != null ? b.ThanhToan.TrangThaiThanhToan : "Pending",
+                NgayTao = b.NgayDat
             })
             .ToListAsync();
     }
 
     public async Task<List<BookingHistoryItemViewModel>> GetAllBookingsAsync(string? status = null)
     {
-        var query = _context.Bookings
-            .Include(b => b.User)
-            .Include(b => b.Showtime).ThenInclude(s => s.Movie)
-            .Include(b => b.Showtime).ThenInclude(s => s.Room).ThenInclude(r => r.Cinema)
-            .Include(b => b.BookingSeats)
-            .Include(b => b.Payment)
+        var query = _context.DatVe
+            .Include(b => b.NguoiDung)
+            .Include(b => b.SuatChieu).ThenInclude(s => s.Phim)
+            .Include(b => b.SuatChieu).ThenInclude(s => s.PhongChieu).ThenInclude(r => r.RapChieu)
+            .Include(b => b.ChiTietGheDats)
+            .Include(b => b.ThanhToan)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(status))
-            query = query.Where(b => b.Status == status);
+            query = query.Where(b => b.TrangThaiDat == status);
 
         return await query
-            .OrderByDescending(b => b.CreatedAt)
+            .OrderByDescending(b => b.NgayDat)
             .Select(b => new BookingHistoryItemViewModel
             {
-                BookingId = b.Id,
-                BookingCode = b.BookingCode,
-                MovieTitle = b.Showtime.Movie.Title,
-                MoviePoster = b.Showtime.Movie.PosterUrl,
-                ShowtimeStart = b.Showtime.StartTime,
-                CinemaName = b.Showtime.Room.Cinema.Name,
-                SeatCount = b.BookingSeats.Count,
-                TotalAmount = b.TotalAmount,
-                BookingStatus = b.Status,
-                PaymentStatus = b.Payment != null ? b.Payment.Status : "Pending",
-                CreatedAt = b.CreatedAt
+                MaDatVe = b.Id,
+                MaGiaoDich = b.MaGiaoDich,
+                TenPhim = b.SuatChieu.Phim.TenPhim,
+                AnhPoster = b.SuatChieu.Phim.AnhPoster,
+                GioBatDau = b.SuatChieu.GioBatDau,
+                TenRap = b.SuatChieu.PhongChieu.RapChieu.TenRap,
+                SoLuongGhe = b.ChiTietGheDats.Count,
+                TongTien = b.TongTien,
+                TrangThaiDat = b.TrangThaiDat,
+                TrangThaiThanhToan = b.ThanhToan != null ? b.ThanhToan.TrangThaiThanhToan : "Pending",
+                NgayTao = b.NgayDat
             })
             .ToListAsync();
     }
 
     public async Task<bool> CancelBookingAsync(int bookingId, int userId)
     {
-        var booking = await _context.Bookings
-            .Include(b => b.Payment)
-            .FirstOrDefaultAsync(b => b.Id == bookingId && b.UserId == userId);
+        var booking = await _context.DatVe
+            .Include(b => b.ThanhToan)
+            .FirstOrDefaultAsync(b => b.Id == bookingId && b.MaNguoiDung == userId);
 
-        if (booking == null || booking.Status == "Cancelled") return false;
+        if (booking == null || booking.TrangThaiDat == "Cancelled") return false;
 
-        booking.Status = "Cancelled";
-        booking.UpdatedAt = DateTime.Now;
+        booking.TrangThaiDat = "Cancelled";
+        booking.NgayCapNhat = DateTime.Now;
 
-        if (booking.Payment?.Status == "Success")
-            booking.Payment.Status = "Refunded";
+        if (booking.ThanhToan?.TrangThaiThanhToan == "Success")
+            booking.ThanhToan.TrangThaiThanhToan = "Refunded";
 
         await _context.SaveChangesAsync();
         return true;
@@ -220,7 +220,6 @@ public class BookingService : IBookingService
         price *= format switch
         {
             "3D" => 1.2m,
-            "4DX" or "IMAX" => 1.5m,
             _ => 1.0m
         };
         return Math.Round(price / 1000) * 1000;

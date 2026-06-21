@@ -8,9 +8,9 @@
         <div class="col-md-4 mb-4">
             <div class="card text-center p-4">
                 <div class="avatar-lg mx-auto mb-3">
-                    @Model.FullName.Substring(0, 1).ToUpper()
+                    @Model.HoTen.Substring(0, 1).ToUpper()
                 </div>
-                <h5 class="fw-bold">@Model.FullName</h5>
+                <h5 class="fw-bold">@Model.HoTen</h5>
                 <p class="text-muted">@Model.Email</p>
                 <a asp-action="ChangePassword" class="btn btn-outline-secondary btn-sm">
                     <i class="fas fa-key me-1"></i>Đổi mật khẩu
@@ -24,21 +24,21 @@
                     <form asp-action="Profile" method="post">
                         @Html.AntiForgeryToken()
                         <div class="mb-3">
-                            <label asp-for="FullName" class="form-label">Họ và tên</label>
-                            <input asp-for="FullName" class="form-control" />
-                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                            <label asp-for="HoTen" class="form-label">Họ và tên</label>
+                            <input asp-for="HoTen" class="form-control" readonly />
+                            <span asp-validation-for="HoTen" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input value="@Model.Email" class="form-control" disabled />
+                            <input value="@Model.Email" class="form-control" style="background-color: #161616 !important; color: #94a3b8;" readonly />
                         </div>
                         <div class="mb-3">
-                            <label asp-for="Phone" class="form-label">Số điện thoại</label>
-                            <input asp-for="Phone" class="form-control" />
+                            <label asp-for="DienThoai" class="form-label">Số điện thoại</label>
+                            <input asp-for="DienThoai" class="form-control" readonly/>
                         </div>
                         <div class="mb-3">
-                            <label asp-for="AvatarUrl" class="form-label">URL Ảnh đại diện</label>
-                            <input asp-for="AvatarUrl" class="form-control" placeholder="https://..." />
+                            <label asp-for="AnhDaiDien" class="form-label">URL Ảnh đại diện</label>
+                            <input asp-for="AnhDaiDien" class="form-control" placeholder="https://..."  readonly/>
                         </div>
                         <button type="submit" class="btn btn-danger"><i class="fas fa-save me-2"></i>Lưu thay đổi</button>
                     </form>

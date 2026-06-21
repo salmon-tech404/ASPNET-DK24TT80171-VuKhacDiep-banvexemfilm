@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace cinemaBooking.Controllers;
 
+[Route("tai-khoan")]
 public class AccountController : Controller
 {
     private readonly IUserService _userService;
@@ -18,6 +19,7 @@ public class AccountController : Controller
     }
 
     [HttpGet]
+    [Route("dang-nhap")]
     public IActionResult Login(string? returnUrl = null)
     {
         if (User.Identity?.IsAuthenticated == true)
@@ -28,11 +30,12 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("dang-nhap")]
     public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
     {
         if (!ModelState.IsValid) return View(model);
 
-        var user = await _userService.AuthenticateAsync(model.Email, model.Password);
+        var user = await _userService.AuthenticateAsync(model.Email, model.MatKhau);
         if (user == null)
         {
             ModelState.AddModelError("", "Email hoặc mật khẩu không đúng");
@@ -42,10 +45,10 @@ public class AccountController : Controller
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.FullName),
+            new(ClaimTypes.Name, user.HoTen),
             new(ClaimTypes.Email, user.Email),
-            new(ClaimTypes.Role, user.Role),
-            new("AvatarUrl", user.AvatarUrl ?? "")
+            new(ClaimTypes.Role, user.VaiTro),
+            new("AvatarUrl", user.AnhDaiDien ?? "")
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -54,18 +57,19 @@ public class AccountController : Controller
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
 
-        TempData["Success"] = $"Chào mừng trở lại, {user.FullName}!";
+        TempData["Success"] = $"Chào mừng trở lại, {user.HoTen}!";
 
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             return Redirect(returnUrl);
 
-        if (user.Role == "Admin")
+        if (user.VaiTro == "Admin")
             return RedirectToAction("Dashboard", "Admin");
 
         return RedirectToAction("Index", "Home");
     }
 
     [HttpGet]
+    [Route("dang-ky")]
     public IActionResult Register()
     {
         if (User.Identity?.IsAuthenticated == true)
@@ -75,6 +79,7 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("dang-ky")]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
         if (!ModelState.IsValid) return View(model);
@@ -85,7 +90,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var user = await _userService.RegisterAsync(model.FullName, model.Email, model.Password, model.Phone);
+        var user = await _userService.RegisterAsync(model.HoTen, model.Email, model.MatKhau, model.DienThoai);
         if (user == null)
         {
             ModelState.AddModelError("", "Đăng ký thất bại, vui lòng thử lại");
@@ -98,6 +103,7 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("dang-xuat")]
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -107,6 +113,7 @@ public class AccountController : Controller
 
     [Authorize]
     [HttpGet]
+    [Route("ho-so")]
     public async Task<IActionResult> Profile()
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -115,43 +122,46 @@ public class AccountController : Controller
 
         return View(new ProfileViewModel
         {
-            FullName = user.FullName,
+            HoTen = user.HoTen,
             Email = user.Email,
-            Phone = user.Phone,
-            AvatarUrl = user.AvatarUrl
+            DienThoai = user.DienThoai,
+            AnhDaiDien = user.AnhDaiDien
         });
     }
 
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("ho-so")]
     public async Task<IActionResult> Profile(ProfileViewModel model)
     {
         if (!ModelState.IsValid) return View(model);
 
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        await _userService.UpdateProfileAsync(userId, model.FullName, model.Phone, model.AvatarUrl);
+        await _userService.UpdateProfileAsync(userId, model.HoTen, model.DienThoai, model.AnhDaiDien);
         TempData["Success"] = "Cập nhật thông tin thành công.";
         return RedirectToAction(nameof(Profile));
     }
 
     [Authorize]
     [HttpGet]
+    [Route("doi-mat-khau")]
     public IActionResult ChangePassword() => View();
 
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("doi-mat-khau")]
     public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
     {
         if (!ModelState.IsValid) return View(model);
 
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var result = await _userService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
+        var result = await _userService.ChangePasswordAsync(userId, model.MatKhauHienTai, model.MatKhauMoi);
 
         if (!result)
         {
-            ModelState.AddModelError("CurrentPassword", "Mật khẩu hiện tại không đúng");
+            ModelState.AddModelError("MatKhauHienTai", "Mật khẩu hiện tại không đúng");
             return View(model);
         }
 
@@ -159,5 +169,6 @@ public class AccountController : Controller
         return RedirectToAction(nameof(Profile));
     }
 
+    [Route("tu-choi-truy-cap")]
     public IActionResult AccessDenied() => View();
 }

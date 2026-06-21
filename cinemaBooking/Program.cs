@@ -17,9 +17,9 @@ builder.Services.AddDbContext<CinemaDbContext>(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Login";
-        options.LogoutPath = "/Account/Logout";
-        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.LoginPath = "/tai-khoan/dang-nhap";
+        options.LogoutPath = "/tai-khoan/dang-xuat";
+        options.AccessDeniedPath = "/tai-khoan/tu-choi-truy-cap";
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
         options.SlidingExpiration = true;
         options.Cookie.HttpOnly = true;

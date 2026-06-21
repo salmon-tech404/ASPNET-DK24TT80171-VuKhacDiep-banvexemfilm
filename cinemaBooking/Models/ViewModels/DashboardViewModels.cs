@@ -2,38 +2,38 @@ namespace cinemaBooking.Models.ViewModels;
 
 public class AdminDashboardViewModel
 {
-    public int TotalMovies { get; set; }
-    public int NowShowingMovies { get; set; }
-    public int TotalUsers { get; set; }
-    public int TotalBookings { get; set; }
-    public int PendingBookings { get; set; }
-    public decimal TotalRevenue { get; set; }
-    public List<RecentBookingViewModel> RecentBookings { get; set; } = new();
-    public List<TopMovieViewModel> TopMovies { get; set; } = new();
+    public int TongSoPhim { get; set; }
+    public int PhimDangChieu { get; set; }
+    public int TongSoNguoiDung { get; set; }
+    public int TongSoDatVe { get; set; }
+    public int DatVePending { get; set; }
+    public decimal TongDoanhThu { get; set; }
+    public List<RecentBookingViewModel> DanhSachDatVeGanDay { get; set; } = new();
+    public List<TopMovieViewModel> DanhSachPhimTop { get; set; } = new();
 }
 
 public class RecentBookingViewModel
 {
     public int Id { get; set; }
-    public string BookingCode { get; set; } = string.Empty;
-    public string UserName { get; set; } = string.Empty;
-    public string MovieTitle { get; set; } = string.Empty;
-    public decimal TotalAmount { get; set; }
-    public string Status { get; set; } = "Pending";
-    public DateTime CreatedAt { get; set; }
+    public string MaGiaoDich { get; set; } = string.Empty;
+    public string TenNguoiDung { get; set; } = string.Empty;
+    public string TenPhim { get; set; } = string.Empty;
+    public decimal TongTien { get; set; }
+    public string TrangThai { get; set; } = "Pending";
+    public DateTime NgayTao { get; set; }
 }
 
 public class TopMovieViewModel
 {
-    public int MovieId { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public string? PosterUrl { get; set; }
-    public int BookingCount { get; set; }
-    public decimal Revenue { get; set; }
+    public int MaPhim { get; set; }
+    public string TenPhim { get; set; } = string.Empty;
+    public string? AnhPoster { get; set; }
+    public int SoLuongDatVe { get; set; }
+    public decimal DoanhThu { get; set; }
 }
 
 public class HomeViewModel
 {
-    public List<MovieCardViewModel> NowShowingMovies { get; set; } = new();
-    public List<MovieCardViewModel> ComingSoonMovies { get; set; } = new();
+    public List<MovieCardViewModel> PhimDangChieu { get; set; } = new();
+    public List<MovieCardViewModel> PhimSapChieu { get; set; } = new();
 }

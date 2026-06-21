@@ -22,7 +22,7 @@
 
 <div class="container">
     <!-- Now Showing -->
-    @if (Model.NowShowingMovies.Any())
+    @if (Model.PhimDangChieu.Any())
     {
         <section class="mb-5">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -34,33 +34,33 @@
                 </a>
             </div>
             <div class="row g-3">
-                @foreach (var movie in Model.NowShowingMovies)
+                @foreach (var movie in Model.PhimDangChieu)
                 {
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="card movie-card h-100">
                             <div class="movie-poster-wrap">
-                                @if (!string.IsNullOrEmpty(movie.PosterUrl))
+                                @if (!string.IsNullOrEmpty(movie.AnhPoster))
                                 {
-                                    <img src="@movie.PosterUrl" class="card-img-top movie-poster" alt="@movie.Title" />
+                                    <img src="@movie.AnhPoster" class="card-img-top movie-poster" alt="@movie.TenPhim" />
                                 }
                                 else
                                 {
                                     <div class="movie-poster-placeholder"><i class="fas fa-film fa-3x text-muted"></i></div>
                                 }
-                                <span class="badge bg-danger age-badge">@movie.AgeRating</span>
+                                <span class="badge bg-danger age-badge">@movie.DoTuoiQuyDinh</span>
                             </div>
                             <div class="card-body p-2">
-                                <h6 class="card-title text-truncate mb-1" title="@movie.Title">@movie.Title</h6>
+                                <h6 class="card-title text-truncate mb-1" title="@movie.TenPhim">@movie.TenPhim</h6>
                                 <p class="card-text small text-muted mb-1">
-                                    <i class="fas fa-clock me-1"></i>@movie.Duration phút
-                                    @if (movie.Rating > 0)
+                                    <i class="fas fa-clock me-1"></i>@movie.ThoiLuong phút
+                                    @if (movie.DiemDanhGia > 0)
                                     {
-                                        <span class="ms-2"><i class="fas fa-star text-warning me-1"></i>@movie.Rating.ToString("0.0")</span>
+                                        <span class="ms-2"><i class="fas fa-star text-warning me-1"></i>@movie.DiemDanhGia.ToString("0.0")</span>
                                     }
                                 </p>
-                                @if (movie.Genres.Any())
+                                @if (movie.TheLoais.Any())
                                 {
-                                    <p class="small text-muted text-truncate mb-2">@string.Join(", ", movie.Genres.Take(2))</p>
+                                    <p class="small text-muted text-truncate mb-2">@string.Join(", ", movie.TheLoais.Take(2))</p>
                                 }
                                 <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.Id" class="btn btn-danger btn-sm w-100">
                                     <i class="fas fa-ticket-alt me-1"></i>Đặt vé
@@ -74,7 +74,7 @@
     }
 
     <!-- Coming Soon -->
-    @if (Model.ComingSoonMovies.Any())
+    @if (Model.PhimSapChieu.Any())
     {
         <section class="mb-5">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -86,28 +86,28 @@
                 </a>
             </div>
             <div class="row g-3">
-                @foreach (var movie in Model.ComingSoonMovies)
+                @foreach (var movie in Model.PhimSapChieu)
                 {
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="card movie-card h-100 opacity-90">
                             <div class="movie-poster-wrap">
-                                @if (!string.IsNullOrEmpty(movie.PosterUrl))
+                                @if (!string.IsNullOrEmpty(movie.AnhPoster))
                                 {
-                                    <img src="@movie.PosterUrl" class="card-img-top movie-poster" alt="@movie.Title" />
+                                    <img src="@movie.AnhPoster" class="card-img-top movie-poster" alt="@movie.TenPhim" />
                                 }
                                 else
                                 {
                                     <div class="movie-poster-placeholder"><i class="fas fa-film fa-3x text-muted"></i></div>
                                 }
-                                <span class="badge bg-warning text-dark age-badge">@movie.AgeRating</span>
+                                <span class="badge bg-warning text-dark age-badge">@movie.DoTuoiQuyDinh</span>
                                 <div class="coming-soon-overlay"><span>Sắp chiếu</span></div>
                             </div>
                             <div class="card-body p-2">
-                                <h6 class="card-title text-truncate mb-1" title="@movie.Title">@movie.Title</h6>
-                                <p class="card-text small text-muted mb-1"><i class="fas fa-clock me-1"></i>@movie.Duration phút</p>
-                                @if (movie.ReleaseDate.HasValue)
+                                <h6 class="card-title text-truncate mb-1" title="@movie.TenPhim">@movie.TenPhim</h6>
+                                <p class="card-text small text-muted mb-1"><i class="fas fa-clock me-1"></i>@movie.ThoiLuong phút</p>
+                                @if (movie.NgayChieu.HasValue)
                                 {
-                                    <p class="small text-warning mb-2"><i class="fas fa-calendar me-1"></i>@movie.ReleaseDate.Value.ToString("dd/MM/yyyy")</p>
+                                    <p class="small text-warning mb-2"><i class="fas fa-calendar me-1"></i>@movie.NgayChieu.Value.ToString("dd/MM/yyyy")</p>
                                 }
                                 <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.Id" class="btn btn-outline-warning btn-sm w-100">Chi tiết</a>
                             </div>

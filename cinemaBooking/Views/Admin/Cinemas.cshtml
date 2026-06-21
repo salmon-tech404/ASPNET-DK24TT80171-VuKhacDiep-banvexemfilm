@@ -1,4 +1,4 @@
-@model List<cinemaBooking.Models.Domain.Cinema>
+@model List<cinemaBooking.Models.Domain.RapChieu>
 @{
     ViewData["Title"] = "Rạp chiếu phim";
 }
@@ -14,19 +14,19 @@
                     <div class="col-md-4">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="fw-bold">@c.Name</h5>
-                                <p class="text-muted mb-1"><i class="fas fa-map-marker-alt me-2"></i>@c.Address</p>
-                                <p class="text-muted mb-1"><i class="fas fa-city me-2"></i>@c.City</p>
-                                @if (!string.IsNullOrEmpty(c.Phone))
+                                <h5 class="fw-bold">@c.TenRap</h5>
+                                <p class="text-muted mb-1"><i class="fas fa-map-marker-alt me-2"></i>@c.DiaChi</p>
+                                <p class="text-muted mb-1"><i class="fas fa-city me-2"></i>@c.ThanhPho</p>
+                                @if (!string.IsNullOrEmpty(c.DienThoai))
                                 {
-                                    <p class="text-muted mb-1"><i class="fas fa-phone me-2"></i>@c.Phone</p>
+                                    <p class="text-muted mb-1"><i class="fas fa-phone me-2"></i>@c.DienThoai</p>
                                 }
                                 @if (!string.IsNullOrEmpty(c.Email))
                                 {
                                     <p class="text-muted mb-1"><i class="fas fa-envelope me-2"></i>@c.Email</p>
                                 }
-                                <span class="badge @(c.IsActive ? "bg-success" : "bg-secondary")">
-                                    @(c.IsActive ? "Hoạt động" : "Tạm ngưng")
+                                <span class="badge @(c.TrangThai ? "bg-success" : "bg-secondary")">
+                                    @(c.TrangThai ? "Hoạt động" : "Tạm ngưng")
                                 </span>
                             </div>
                         </div>

@@ -26,12 +26,12 @@
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Password" class="form-label">Mật khẩu</label>
+                            <label asp-for="MatKhau" class="form-label">Mật khẩu</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                <input asp-for="Password" class="form-control" placeholder="Nhập mật khẩu" />
+                                <input asp-for="MatKhau" class="form-control" placeholder="Nhập mật khẩu" />
                             </div>
-                            <span asp-validation-for="Password" class="text-danger small"></span>
+                            <span asp-validation-for="MatKhau" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3 form-check">
@@ -51,7 +51,8 @@
 
                     <!-- Demo hint -->
                     <div class="alert alert-info mt-3 py-2 small">
-                        <strong>Tài khoản demo:</strong><br />
+                        <strong>Để đăng nhập và kiểm tra</strong><br />
+                        <p>Xin thầy dùng thử tài khoản dưới đây ạ</p>
                         Admin: <code>admin@cinema.com</code> / <code>Admin@123</code><br />
                         Khách: <code>diep@cinema.com</code> / <code>Customer@123</code>
                     </div>

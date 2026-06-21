@@ -4,9 +4,9 @@ namespace cinemaBooking.Services.Interfaces;
 
 public interface ICinemaService
 {
-    Task<List<Cinema>> GetAllCinemasAsync();
-    Task<Cinema?> GetCinemaByIdAsync(int cinemaId);
-    Task<List<Room>> GetRoomsByCinemaAsync(int cinemaId);
-    Task<Room?> GetRoomByIdAsync(int roomId);
-    Task<List<(Room Room, Cinema Cinema)>> GetAllRoomsWithCinemaAsync();
+    Task<List<RapChieu>> GetAllCinemasAsync();
+    Task<RapChieu?> GetCinemaByIdAsync(int cinemaId);
+    Task<List<PhongChieu>> GetRoomsByCinemaAsync(int cinemaId);
+    Task<PhongChieu?> GetRoomByIdAsync(int roomId);
+    Task<List<(PhongChieu Room, RapChieu Cinema)>> GetAllRoomsWithCinemaAsync();
 }

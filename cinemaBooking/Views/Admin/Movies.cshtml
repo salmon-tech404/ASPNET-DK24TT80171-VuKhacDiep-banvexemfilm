@@ -42,31 +42,31 @@
                             {
                                 <tr>
                                     <td>
-                                        @if (!string.IsNullOrEmpty(m.PosterUrl))
+                                        @if (!string.IsNullOrEmpty(m.AnhPoster))
                                         {
-                                            <img src="@m.PosterUrl" style="width:40px;height:55px;object-fit:cover" class="rounded" />
+                                            <img src="@m.AnhPoster" style="width:40px;height:55px;object-fit:cover" class="rounded" />
                                         }
                                     </td>
                                     <td>
-                                        <div class="fw-bold">@m.Title</div>
-                                        <div class="small text-muted">@string.Join(", ", m.Genres.Take(2))</div>
+                                        <div class="fw-bold">@m.TenPhim</div>
+                                        <div class="small text-muted">@string.Join(", ", m.TheLoais.Take(2))</div>
                                     </td>
-                                    <td>@m.Duration phút</td>
+                                    <td>@m.ThoiLuong phút</td>
                                     <td>
-                                        @if (m.Rating > 0)
+                                        @if (m.DiemDanhGia > 0)
                                         {
-                                            <i class="fas fa-star text-warning me-1"></i>@m.Rating.ToString("0.0")
+                                            <i class="fas fa-star text-warning me-1"></i>@m.DiemDanhGia.ToString("0.0")
                                         }
                                         else { <span class="text-muted">—</span> }
                                     </td>
                                     <td>
-                                        @{var (cls,txt) = m.Status switch {"NowShowing"=>("success","Đang chiếu"),"ComingSoon"=>("warning text-dark","Sắp chiếu"),_=>("secondary","Kết thúc")};}
+                                        @{var (cls,txt) = m.TrangThaiChieu switch {"NowShowing"=>("success","Đang chiếu"),"ComingSoon"=>("warning text-dark","Sắp chiếu"),_=>("secondary","Kết thúc")};}
                                         <span class="badge bg-@cls">@txt</span>
                                     </td>
                                     <td>
                                         <a asp-controller="Movie" asp-action="Edit" asp-route-id="@m.Id" class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-edit"></i></a>
                                         <form asp-controller="Movie" asp-action="Delete" asp-route-id="@m.Id" method="post" class="d-inline"
-                                              onsubmit="return confirm('Xóa phim @m.Title?')">
+                                              onsubmit="return confirm('Xóa phim @m.TenPhim?')">
                                             @Html.AntiForgeryToken()
                                             <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
                                         </form>

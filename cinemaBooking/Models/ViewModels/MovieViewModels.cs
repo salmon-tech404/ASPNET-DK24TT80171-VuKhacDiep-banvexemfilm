@@ -5,57 +5,57 @@ namespace cinemaBooking.Models.ViewModels;
 public class MovieCardViewModel
 {
     public int Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public string? PosterUrl { get; set; }
-    public int Duration { get; set; }
-    public decimal Rating { get; set; }
-    public string AgeRating { get; set; } = "P";
-    public string Status { get; set; } = "ComingSoon";
-    public DateOnly? ReleaseDate { get; set; }
-    public List<string> Genres { get; set; } = new();
+    public string TenPhim { get; set; } = string.Empty;
+    public string? AnhPoster { get; set; }
+    public int ThoiLuong { get; set; }
+    public decimal DiemDanhGia { get; set; }
+    public string DoTuoiQuyDinh { get; set; } = "P";
+    public string TrangThaiChieu { get; set; } = "ComingSoon";
+    public DateOnly? NgayChieu { get; set; }
+    public List<string> TheLoais { get; set; } = new();
 }
 
 public class MovieDetailViewModel
 {
     public int Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public string? OriginalTitle { get; set; }
-    public string? Description { get; set; }
-    public int Duration { get; set; }
-    public DateOnly? ReleaseDate { get; set; }
-    public DateOnly? EndDate { get; set; }
-    public string? Language { get; set; }
-    public string? Country { get; set; }
-    public string? Director { get; set; }
-    public string? Cast { get; set; }
-    public string? PosterUrl { get; set; }
-    public string? TrailerUrl { get; set; }
-    public decimal Rating { get; set; }
-    public string AgeRating { get; set; } = "P";
-    public string Status { get; set; } = "ComingSoon";
-    public List<string> Genres { get; set; } = new();
-    public List<ShowtimeGroupViewModel> ShowtimeGroups { get; set; } = new();
+    public string TenPhim { get; set; } = string.Empty;
+    public string? TenGoc { get; set; }
+    public string? MoTa { get; set; }
+    public int ThoiLuong { get; set; }
+    public DateOnly? NgayChieu { get; set; }
+    public DateOnly? NgayKetThuc { get; set; }
+    public string? NgonNgu { get; set; }
+    public string? QuocGia { get; set; }
+    public string? DaoDien { get; set; }
+    public string? DienVien { get; set; }
+    public string? AnhPoster { get; set; }
+    public string? LinkTrailer { get; set; }
+    public decimal DiemDanhGia { get; set; }
+    public string DoTuoiQuyDinh { get; set; } = "P";
+    public string TrangThaiChieu { get; set; } = "ComingSoon";
+    public List<string> TheLoais { get; set; } = new();
+    public List<ShowtimeGroupViewModel> NhomSuatChieus { get; set; } = new();
 }
 
 public class ShowtimeGroupViewModel
 {
-    public string CinemaName { get; set; } = string.Empty;
-    public string CinemaCity { get; set; } = string.Empty;
-    public List<ShowtimeItemViewModel> Showtimes { get; set; } = new();
+    public string TenRap { get; set; } = string.Empty;
+    public string ThanhPho { get; set; } = string.Empty;
+    public List<ShowtimeItemViewModel> SuatChieus { get; set; } = new();
 }
 
 public class ShowtimeItemViewModel
 {
     public int Id { get; set; }
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
-    public string Format { get; set; } = "2D";
-    public string SubType { get; set; } = "Vietsub";
-    public decimal BasePrice { get; set; }
-    public string RoomName { get; set; } = string.Empty;
-    public string Status { get; set; } = "Scheduled";
-    public int AvailableSeats { get; set; }
-    public int TotalSeats { get; set; }
+    public DateTime GioBatDau { get; set; }
+    public DateTime GioKetThuc { get; set; }
+    public string DinhDang { get; set; } = "2D";
+    public string PhongDich { get; set; } = "Vietsub";
+    public decimal GiaVeCoBan { get; set; }
+    public string TenPhong { get; set; } = string.Empty;
+    public string TrangThaiSuat { get; set; } = "Scheduled";
+    public int SoGheTrong { get; set; }
+    public int TongSoGhe { get; set; }
 }
 
 public class MovieFormViewModel
@@ -64,47 +64,47 @@ public class MovieFormViewModel
 
     [Required(ErrorMessage = "Tên phim không được để trống")]
     [StringLength(200)]
-    public string Title { get; set; } = string.Empty;
+    public string TenPhim { get; set; } = string.Empty;
 
-    public string? OriginalTitle { get; set; }
+    public string? TenGoc { get; set; }
 
-    public string? Description { get; set; }
+    public string? MoTa { get; set; }
 
     [Required(ErrorMessage = "Thời lượng không được để trống")]
     [Range(1, 500)]
-    public int Duration { get; set; }
+    public int ThoiLuong { get; set; }
 
-    public DateOnly? ReleaseDate { get; set; }
-    public DateOnly? EndDate { get; set; }
-    public string? Language { get; set; }
-    public string? Country { get; set; }
-    public string? Director { get; set; }
-    public string? Cast { get; set; }
-    public string? PosterUrl { get; set; }
-    public string? TrailerUrl { get; set; }
+    public DateOnly? NgayChieu { get; set; }
+    public DateOnly? NgayKetThuc { get; set; }
+    public string? NgonNgu { get; set; }
+    public string? QuocGia { get; set; }
+    public string? DaoDien { get; set; }
+    public string? DienVien { get; set; }
+    public string? AnhPoster { get; set; }
+    public string? LinkTrailer { get; set; }
 
     [Range(0, 10)]
-    public decimal Rating { get; set; }
+    public decimal DiemDanhGia { get; set; }
 
-    public string AgeRating { get; set; } = "P";
-    public string Status { get; set; } = "ComingSoon";
+    public string DoTuoiQuyDinh { get; set; } = "P";
+    public string TrangThaiChieu { get; set; } = "ComingSoon";
 
-    public List<int> SelectedGenreIds { get; set; } = new();
-    public List<GenreCheckboxItem> AllGenres { get; set; } = new();
+    public List<int> MaTheLoaisDaChon { get; set; } = new();
+    public List<GenreCheckboxItem> TatCaTheLoai { get; set; } = new();
 }
 
 public class GenreCheckboxItem
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public string TenTheLoai { get; set; } = string.Empty;
     public bool IsChecked { get; set; }
 }
 
 public class MovieListPageViewModel
 {
-    public List<MovieCardViewModel> Movies { get; set; } = new();
+    public List<MovieCardViewModel> Phims { get; set; } = new();
     public string? SearchQuery { get; set; }
     public string? StatusFilter { get; set; }
     public int? GenreFilter { get; set; }
-    public List<(int Id, string Name)> Genres { get; set; } = new();
+    public List<(int Id, string TenTheLoai)> TheLoais { get; set; } = new();
 }

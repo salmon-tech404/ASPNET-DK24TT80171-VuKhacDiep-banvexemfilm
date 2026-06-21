@@ -2,43 +2,43 @@
 
 <div class="row g-3">
     <div class="col-md-6">
-        <label asp-for="MovieId" class="form-label">Phim *</label>
-        <select asp-for="MovieId" class="form-select">
+        <label asp-for="MaPhim" class="form-label">Phim *</label>
+        <select asp-for="MaPhim" class="form-select">
             <option value="">-- Chọn phim --</option>
-            @foreach (var m in Model.Movies)
+            @foreach (var m in Model.Phims)
             {
-                <option value="@m.Id" selected="@(Model.MovieId == m.Id)">@m.Title</option>
+                <option value="@m.Id" selected="@(Model.MaPhim == m.Id)">@m.TenPhim</option>
             }
         </select>
-        <span asp-validation-for="MovieId" class="text-danger small"></span>
+        <span asp-validation-for="MaPhim" class="text-danger small"></span>
     </div>
     <div class="col-md-6">
-        <label asp-for="RoomId" class="form-label">Phòng chiếu *</label>
-        <select asp-for="RoomId" class="form-select">
+        <label asp-for="MaPhong" class="form-label">Phòng chiếu *</label>
+        <select asp-for="MaPhong" class="form-select">
             <option value="">-- Chọn phòng --</option>
-            @foreach (var r in Model.Rooms)
+            @foreach (var r in Model.Phongs)
             {
-                <option value="@r.Id" selected="@(Model.RoomId == r.Id)">@r.CinemaName – @r.DisplayName</option>
+                <option value="@r.Id" selected="@(Model.MaPhong == r.Id)">@r.TenRap – @r.TenPhong</option>
             }
         </select>
-        <span asp-validation-for="RoomId" class="text-danger small"></span>
+        <span asp-validation-for="MaPhong" class="text-danger small"></span>
     </div>
     <div class="col-md-4">
-        <label asp-for="StartTime" class="form-label">Thời gian bắt đầu *</label>
-        <input asp-for="StartTime" class="form-control" type="datetime-local" />
-        <span asp-validation-for="StartTime" class="text-danger small"></span>
+        <label asp-for="GioBatDau" class="form-label">Thời gian bắt đầu *</label>
+        <input asp-for="GioBatDau" class="form-control" type="datetime-local" />
+        <span asp-validation-for="GioBatDau" class="text-danger small"></span>
     </div>
     <div class="col-md-4">
-        <label asp-for="SubType" class="form-label">Phụ đề / Lồng tiếng</label>
-        <select asp-for="SubType" class="form-select">
+        <label asp-for="PhongDich" class="form-label">Phụ đề / Lồng tiếng</label>
+        <select asp-for="PhongDich" class="form-select">
             <option value="Vietsub">Vietsub</option>
             <option value="Dubbed">Lồng tiếng</option>
             <option value="Original">Tiếng gốc</option>
         </select>
     </div>
     <div class="col-md-4">
-        <label asp-for="Format" class="form-label">Định dạng</label>
-        <select asp-for="Format" class="form-select">
+        <label asp-for="DinhDang" class="form-label">Định dạng</label>
+        <select asp-for="DinhDang" class="form-select">
             <option value="2D">2D</option>
             <option value="3D">3D</option>
             <option value="4DX">4DX</option>
@@ -46,13 +46,13 @@
         </select>
     </div>
     <div class="col-md-4">
-        <label asp-for="BasePrice" class="form-label">Giá vé cơ bản (VNĐ) *</label>
-        <input asp-for="BasePrice" class="form-control" type="number" placeholder="85000" />
-        <span asp-validation-for="BasePrice" class="text-danger small"></span>
+        <label asp-for="GiaVeCoBan" class="form-label">Giá vé cơ bản (VNĐ) *</label>
+        <input asp-for="GiaVeCoBan" class="form-control" type="number" placeholder="85000" />
+        <span asp-validation-for="GiaVeCoBan" class="text-danger small"></span>
     </div>
     <div class="col-md-4">
-        <label asp-for="Status" class="form-label">Trạng thái</label>
-        <select asp-for="Status" class="form-select">
+        <label asp-for="TrangThaiSuat" class="form-label">Trạng thái</label>
+        <select asp-for="TrangThaiSuat" class="form-select">
             <option value="Scheduled">Đã lên lịch</option>
             <option value="Ongoing">Đang chiếu</option>
             <option value="Completed">Hoàn thành</option>

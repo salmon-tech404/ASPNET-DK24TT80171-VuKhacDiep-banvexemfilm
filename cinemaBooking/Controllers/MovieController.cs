@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace cinemaBooking.Controllers;
 
+[Route("phim")]
 public class MovieController : Controller
 {
     private readonly IMovieService _movieService;
@@ -14,6 +15,7 @@ public class MovieController : Controller
         _movieService = movieService;
     }
 
+    [Route("")]
     public async Task<IActionResult> Index(string? search, string? status, int? genreId)
     {
         var movies = await _movieService.GetMoviesAsync(search, status, genreId);
@@ -21,15 +23,16 @@ public class MovieController : Controller
 
         var vm = new MovieListPageViewModel
         {
-            Movies = movies,
+            Phims = movies,
             SearchQuery = search,
             StatusFilter = status,
             GenreFilter = genreId,
-            Genres = genres.Select(g => (g.Id, g.Name)).ToList()
+            TheLoais = genres.Select(g => (g.Id, g.TenTheLoai)).ToList()
         };
         return View(vm);
     }
 
+    [Route("chi-tiet/{id}")]
     public async Task<IActionResult> Details(int id, DateTime? date)
     {
         var movie = await _movieService.GetMovieDetailAsync(id, date);
@@ -40,6 +43,7 @@ public class MovieController : Controller
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
+    [Route("them-phim")]
     public async Task<IActionResult> Create()
     {
         var vm = await _movieService.GetMovieFormAsync();
@@ -49,22 +53,24 @@ public class MovieController : Controller
     [Authorize(Roles = "Admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("them-phim")]
     public async Task<IActionResult> Create(MovieFormViewModel model)
     {
         if (!ModelState.IsValid)
         {
             var allGenres = await _movieService.GetAllGenresAsync();
-            model.AllGenres = allGenres.Select(g => new GenreCheckboxItem { Id = g.Id, Name = g.Name, IsChecked = model.SelectedGenreIds.Contains(g.Id) }).ToList();
+            model.TatCaTheLoai = allGenres.Select(g => new GenreCheckboxItem { Id = g.Id, TenTheLoai = g.TenTheLoai, IsChecked = model.MaTheLoaisDaChon.Contains(g.Id) }).ToList();
             return View(model);
         }
 
         var movie = await _movieService.CreateMovieAsync(model);
-        TempData["Success"] = $"Thêm phim '{movie.Title}' thành công.";
+        TempData["Success"] = $"Thêm phim '{movie.TenPhim}' thành công.";
         return RedirectToAction("Movies", "Admin");
     }
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
+    [Route("sua-phim/{id}")]
     public async Task<IActionResult> Edit(int id)
     {
         var vm = await _movieService.GetMovieFormAsync(id);
@@ -75,12 +81,13 @@ public class MovieController : Controller
     [Authorize(Roles = "Admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("sua-phim/{id}")]
     public async Task<IActionResult> Edit(int id, MovieFormViewModel model)
     {
         if (!ModelState.IsValid)
         {
             var allGenres = await _movieService.GetAllGenresAsync();
-            model.AllGenres = allGenres.Select(g => new GenreCheckboxItem { Id = g.Id, Name = g.Name, IsChecked = model.SelectedGenreIds.Contains(g.Id) }).ToList();
+            model.TatCaTheLoai = allGenres.Select(g => new GenreCheckboxItem { Id = g.Id, TenTheLoai = g.TenTheLoai, IsChecked = model.MaTheLoaisDaChon.Contains(g.Id) }).ToList();
             return View(model);
         }
 
@@ -92,6 +99,7 @@ public class MovieController : Controller
     [Authorize(Roles = "Admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("xoa-phim/{id}")]
     public async Task<IActionResult> Delete(int id)
     {
         await _movieService.DeleteMovieAsync(id);

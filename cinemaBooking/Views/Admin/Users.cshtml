@@ -1,4 +1,4 @@
-@model List<cinemaBooking.Models.Domain.User>
+@model List<cinemaBooking.Models.Domain.NguoiDung>
 @{
     ViewData["Title"] = "Quản lý người dùng";
 }
@@ -32,31 +32,31 @@
                         <tbody>
                             @foreach (var u in Model)
                             {
-                                <tr class="@(u.IsActive ? "" : "table-secondary")">
-                                    <td><strong>@u.FullName</strong></td>
+                                <tr class="@(u.TrangThai ? "" : "table-secondary")">
+                                    <td><strong>@u.HoTen</strong></td>
                                     <td class="text-muted small">@u.Email</td>
-                                    <td class="small">@(u.Phone ?? "—")</td>
+                                    <td class="small">@(u.DienThoai ?? "—")</td>
                                     <td>
                                         <form asp-action="ChangeUserRole" method="post" class="d-inline">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@u.Id" />
                                             <select name="role" class="form-select form-select-sm" style="width:120px" onchange="this.form.submit()">
-                                                <option value="Admin" selected="@(u.Role == "Admin")">Admin</option>
-                                                <option value="Customer" selected="@(u.Role == "Customer")">Khách hàng</option>
+                                                <option value="Admin" selected="@(u.VaiTro == "Admin")">Admin</option>
+                                                <option value="Customer" selected="@(u.VaiTro == "Customer")">Khách hàng</option>
                                             </select>
                                         </form>
                                     </td>
                                     <td>
-                                        <span class="badge @(u.IsActive ? "bg-success" : "bg-secondary")">
-                                            @(u.IsActive ? "Hoạt động" : "Tạm khóa")
+                                        <span class="badge @(u.TrangThai ? "bg-success" : "bg-secondary")">
+                                            @(u.TrangThai ? "Hoạt động" : "Tạm khóa")
                                         </span>
                                     </td>
-                                    <td class="small text-muted">@u.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                    <td class="small text-muted">@u.NgayTao.ToString("dd/MM/yyyy")</td>
                                     <td>
                                         <form asp-action="ToggleUserStatus" asp-route-id="@u.Id" method="post" class="d-inline">
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm @(u.IsActive ? "btn-outline-warning" : "btn-outline-success")">
-                                                <i class="fas @(u.IsActive ? "fa-lock" : "fa-unlock")"></i>
+                                            <button type="submit" class="btn btn-sm @(u.TrangThai ? "btn-outline-warning" : "btn-outline-success")">
+                                                <i class="fas @(u.TrangThai ? "fa-lock" : "fa-unlock")"></i>
                                             </button>
                                         </form>
                                     </td>

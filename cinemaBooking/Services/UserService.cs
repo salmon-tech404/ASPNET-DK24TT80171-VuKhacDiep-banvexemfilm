@@ -11,48 +11,48 @@ public class UserService : IUserService
 
     public UserService(CinemaDbContext context) => _context = context;
 
-    public async Task<User?> GetUserByIdAsync(int id) =>
-        await _context.Users.FindAsync(id);
+    public async Task<NguoiDung?> GetUserByIdAsync(int id) =>
+        await _context.NguoiDung.FindAsync(id);
 
-    public async Task<User?> GetUserByEmailAsync(string email) =>
-        await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+    public async Task<NguoiDung?> GetUserByEmailAsync(string email) =>
+        await _context.NguoiDung.FirstOrDefaultAsync(u => u.Email == email);
 
-    public async Task<User?> AuthenticateAsync(string email, string password)
+    public async Task<NguoiDung?> AuthenticateAsync(string email, string password)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.IsActive);
+        var user = await _context.NguoiDung.FirstOrDefaultAsync(u => u.Email == email && u.TrangThai);
         if (user == null) return null;
-        return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash) ? user : null;
+        return user.MatKhau == password ? user : null;
     }
 
-    public async Task<User?> RegisterAsync(string fullName, string email, string password, string? phone)
+    public async Task<NguoiDung?> RegisterAsync(string fullName, string email, string password, string? phone)
     {
         if (await EmailExistsAsync(email)) return null;
 
-        var user = new User
+        var user = new NguoiDung
         {
-            FullName = fullName,
+            HoTen = fullName,
             Email = email,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
-            Phone = phone,
-            Role = "Customer",
-            IsActive = true,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
+            MatKhau = password,
+            DienThoai = phone,
+            VaiTro = "Customer",
+            TrangThai = true,
+            NgayTao = DateTime.Now,
+            NgayCapNhat = DateTime.Now
         };
-        _context.Users.Add(user);
+        _context.NguoiDung.Add(user);
         await _context.SaveChangesAsync();
         return user;
     }
 
     public async Task<bool> UpdateProfileAsync(int userId, string fullName, string? phone, string? avatarUrl)
     {
-        var user = await _context.Users.FindAsync(userId);
+        var user = await _context.NguoiDung.FindAsync(userId);
         if (user == null) return false;
 
-        user.FullName = fullName;
-        user.Phone = phone;
-        user.AvatarUrl = avatarUrl;
-        user.UpdatedAt = DateTime.Now;
+        user.HoTen = fullName;
+        user.DienThoai = phone;
+        user.AnhDaiDien = avatarUrl;
+        user.NgayCapNhat = DateTime.Now;
 
         await _context.SaveChangesAsync();
         return true;
@@ -60,49 +60,49 @@ public class UserService : IUserService
 
     public async Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
     {
-        var user = await _context.Users.FindAsync(userId);
+        var user = await _context.NguoiDung.FindAsync(userId);
         if (user == null) return false;
-        if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash)) return false;
+        if (user.MatKhau != currentPassword) return false;
 
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
-        user.UpdatedAt = DateTime.Now;
+        user.MatKhau = newPassword;
+        user.NgayCapNhat = DateTime.Now;
         await _context.SaveChangesAsync();
         return true;
     }
 
-    public async Task<List<User>> GetAllUsersAsync(string? search = null, string? role = null)
+    public async Task<List<NguoiDung>> GetAllUsersAsync(string? search = null, string? role = null)
     {
-        var query = _context.Users.AsQueryable();
+        var query = _context.NguoiDung.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(u => u.FullName.Contains(search) || u.Email.Contains(search));
+            query = query.Where(u => u.HoTen.Contains(search) || u.Email.Contains(search));
 
         if (!string.IsNullOrWhiteSpace(role))
-            query = query.Where(u => u.Role == role);
+            query = query.Where(u => u.VaiTro == role);
 
-        return await query.OrderByDescending(u => u.CreatedAt).ToListAsync();
+        return await query.OrderByDescending(u => u.NgayTao).ToListAsync();
     }
 
     public async Task<bool> ToggleUserActiveAsync(int userId)
     {
-        var user = await _context.Users.FindAsync(userId);
+        var user = await _context.NguoiDung.FindAsync(userId);
         if (user == null) return false;
-        user.IsActive = !user.IsActive;
-        user.UpdatedAt = DateTime.Now;
+        user.TrangThai = !user.TrangThai;
+        user.NgayCapNhat = DateTime.Now;
         await _context.SaveChangesAsync();
         return true;
     }
 
     public async Task<bool> ChangeUserRoleAsync(int userId, string role)
     {
-        var user = await _context.Users.FindAsync(userId);
+        var user = await _context.NguoiDung.FindAsync(userId);
         if (user == null) return false;
-        user.Role = role;
-        user.UpdatedAt = DateTime.Now;
+        user.VaiTro = role;
+        user.NgayCapNhat = DateTime.Now;
         await _context.SaveChangesAsync();
         return true;
     }
 
     public async Task<bool> EmailExistsAsync(string email) =>
-        await _context.Users.AnyAsync(u => u.Email == email);
+        await _context.NguoiDung.AnyAsync(u => u.Email == email);
 }

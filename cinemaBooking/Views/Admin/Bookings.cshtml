@@ -31,17 +31,17 @@
                             @foreach (var b in Model)
                             {
                                 <tr>
-                                    <td><code>@b.BookingCode</code></td>
-                                    <td class="text-truncate fw-bold" style="max-width:130px">@b.MovieTitle</td>
-                                    <td class="small text-muted">@b.CinemaName</td>
-                                    <td class="small">@b.ShowtimeStart.ToString("HH:mm dd/MM")</td>
-                                    <td>@b.SeatCount ghế</td>
-                                    <td class="fw-bold">@b.TotalAmount.ToString("N0")đ</td>
+                                    <td><code>@b.MaGiaoDich</code></td>
+                                    <td class="text-truncate fw-bold" style="max-width:130px">@b.TenPhim</td>
+                                    <td class="small text-muted">@b.TenRap</td>
+                                    <td class="small">@b.GioBatDau.ToString("HH:mm dd/MM")</td>
+                                    <td>@b.SoLuongGhe ghế</td>
+                                    <td class="fw-bold">@b.TongTien.ToString("N0")đ</td>
                                     <td>
-                                        @{var (cls,txt) = b.BookingStatus switch {"Confirmed"=>("success","Xác nhận"),"Cancelled"=>("secondary","Hủy"),_=>("warning","Chờ")};}
+                                        @{var (cls,txt) = b.TrangThaiDat switch {"Confirmed"=>("success","Xác nhận"),"Cancelled"=>("secondary","Hủy"),_=>("warning","Chờ")};}
                                         <span class="badge bg-@cls">@txt</span>
                                     </td>
-                                    <td class="small text-muted">@b.CreatedAt.ToString("dd/MM HH:mm")</td>
+                                    <td class="small text-muted">@b.NgayTao.ToString("dd/MM HH:mm")</td>
                                 </tr>
                             }
                         </tbody>

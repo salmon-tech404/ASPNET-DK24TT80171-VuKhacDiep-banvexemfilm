@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace cinemaBooking.Controllers;
 
+[Route("")]
 public class HomeController : Controller
 {
     private readonly IMovieService _movieService;
@@ -15,6 +16,7 @@ public class HomeController : Controller
         _movieService = movieService;
     }
 
+    [Route("")]
     public async Task<IActionResult> Index()
     {
         var nowShowing = await _movieService.GetMoviesAsync(status: "NowShowing");
@@ -22,15 +24,17 @@ public class HomeController : Controller
 
         var vm = new HomeViewModel
         {
-            NowShowingMovies = nowShowing.Take(8).ToList(),
-            ComingSoonMovies = comingSoon.Take(4).ToList()
+            PhimDangChieu = nowShowing.Take(8).ToList(),
+            PhimSapChieu = comingSoon.Take(4).ToList()
         };
         return View(vm);
     }
 
+    [Route("chinh-sach-bao-mat")]
     public IActionResult Privacy() => View();
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    [Route("loi")]
     public IActionResult Error() =>
         View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 }

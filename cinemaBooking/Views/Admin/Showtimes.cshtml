@@ -21,14 +21,14 @@
                             @foreach (var st in Model)
                             {
                                 <tr>
-                                    <td class="fw-bold text-truncate" style="max-width:150px">@st.MovieTitle</td>
-                                    <td class="small">@st.CinemaName<br /><span class="text-muted">@st.RoomName</span></td>
-                                    <td class="small">@st.StartTime.ToString("HH:mm")<br /><span class="text-muted">@st.StartTime.ToString("dd/MM/yyyy")</span></td>
-                                    <td><span class="badge bg-dark">@st.Format</span> @st.SubType</td>
-                                    <td>@st.BasePrice.ToString("N0")đ</td>
-                                    <td>@st.BookingsCount vé</td>
+                                    <td class="fw-bold text-truncate" style="max-width:150px">@st.TenPhim</td>
+                                    <td class="small">@st.TenRap<br /><span class="text-muted">@st.TenPhong</span></td>
+                                    <td class="small">@st.GioBatDau.ToString("HH:mm")<br /><span class="text-muted">@st.GioBatDau.ToString("dd/MM/yyyy")</span></td>
+                                    <td><span class="badge bg-dark">@st.DinhDang</span> @st.PhongDich</td>
+                                    <td>@st.GiaVeCoBan.ToString("N0")đ</td>
+                                    <td>@st.SoLuongDatVe vé</td>
                                     <td>
-                                        @{var (cls,txt) = st.Status switch {"Scheduled"=>("success","Đã lên lịch"),"Ongoing"=>("warning","Đang chiếu"),"Completed"=>("info","Hoàn thành"),_=>("secondary","Đã hủy")};}
+                                        @{var (cls,txt) = st.TrangThaiSuat switch {"Scheduled"=>("success","Đã lên lịch"),"Ongoing"=>("warning","Đang chiếu"),"Completed"=>("info","Hoàn thành"),_=>("secondary","Đã hủy")};}
                                         <span class="badge bg-@cls">@txt</span>
                                     </td>
                                     <td>

@@ -1,15 +1,15 @@
 @model cinemaBooking.Models.ViewModels.MovieDetailViewModel
 @{
-    ViewData["Title"] = Model.Title;
+    ViewData["Title"] = Model.TenPhim;
 }
 
 <div class="container mt-4">
     <!-- Movie Header -->
     <div class="row mb-5">
         <div class="col-md-3 mb-3">
-            @if (!string.IsNullOrEmpty(Model.PosterUrl))
+            @if (!string.IsNullOrEmpty(Model.AnhPoster))
             {
-                <img src="@Model.PosterUrl" class="img-fluid rounded shadow" alt="@Model.Title" style="max-height:420px;width:100%;object-fit:cover;" />
+                <img src="@Model.AnhPoster" class="img-fluid rounded shadow" alt="@Model.TenPhim" style="max-height:420px;width:100%;object-fit:cover;" />
             }
             else
             {
@@ -19,23 +19,23 @@
             }
         </div>
         <div class="col-md-9">
-            <h1 class="fw-bold">@Model.Title</h1>
-            @if (!string.IsNullOrEmpty(Model.OriginalTitle))
+            <h1 class="fw-bold">@Model.TenPhim</h1>
+            @if (!string.IsNullOrEmpty(Model.TenGoc))
             {
-                <p class="text-muted fst-italic">@Model.OriginalTitle</p>
+                <p class="text-muted fst-italic">@Model.TenGoc</p>
             }
 
             <div class="d-flex flex-wrap gap-2 mb-3">
-                <span class="badge bg-danger fs-6">@Model.AgeRating</span>
+                <span class="badge bg-danger fs-6">@Model.DoTuoiQuyDinh</span>
                 @{
-                    var (statusClass, statusText) = Model.Status switch {
+                    var (statusClass, statusText) = Model.TrangThaiChieu switch {
                         "NowShowing" => ("bg-success", "Đang chiếu"),
                         "ComingSoon" => ("bg-warning text-dark", "Sắp chiếu"),
                         _ => ("bg-secondary", "Đã kết thúc")
                     };
                 }
                 <span class="badge @statusClass fs-6">@statusText</span>
-                @foreach (var genre in Model.Genres)
+                @foreach (var genre in Model.TheLoais)
                 {
                     <span class="badge bg-outline-secondary border text-dark">@genre</span>
                 }
@@ -44,53 +44,53 @@
             <div class="row g-2 mb-3">
                 <div class="col-6 col-md-3">
                     <div class="text-muted small">Thời lượng</div>
-                    <div class="fw-bold"><i class="fas fa-clock me-1 text-danger"></i>@Model.Duration phút</div>
+                    <div class="fw-bold"><i class="fas fa-clock me-1 text-danger"></i>@Model.ThoiLuong phút</div>
                 </div>
-                @if (Model.Rating > 0)
+                @if (Model.DiemDanhGia > 0)
                 {
                     <div class="col-6 col-md-3">
                         <div class="text-muted small">Đánh giá</div>
-                        <div class="fw-bold"><i class="fas fa-star me-1 text-warning"></i>@Model.Rating.ToString("0.0")/10</div>
+                        <div class="fw-bold"><i class="fas fa-star me-1 text-warning"></i>@Model.DiemDanhGia.ToString("0.0")/10</div>
                     </div>
                 }
-                @if (!string.IsNullOrEmpty(Model.Language))
+                @if (!string.IsNullOrEmpty(Model.NgonNgu))
                 {
                     <div class="col-6 col-md-3">
                         <div class="text-muted small">Ngôn ngữ</div>
-                        <div class="fw-bold">@Model.Language</div>
+                        <div class="fw-bold">@Model.NgonNgu</div>
                     </div>
                 }
-                @if (!string.IsNullOrEmpty(Model.Country))
+                @if (!string.IsNullOrEmpty(Model.QuocGia))
                 {
                     <div class="col-6 col-md-3">
                         <div class="text-muted small">Quốc gia</div>
-                        <div class="fw-bold">@Model.Country</div>
+                        <div class="fw-bold">@Model.QuocGia</div>
                     </div>
                 }
-                @if (!string.IsNullOrEmpty(Model.Director))
+                @if (!string.IsNullOrEmpty(Model.DaoDien))
                 {
                     <div class="col-12 col-md-6">
                         <div class="text-muted small">Đạo diễn</div>
-                        <div class="fw-bold">@Model.Director</div>
+                        <div class="fw-bold">@Model.DaoDien</div>
                     </div>
                 }
-                @if (!string.IsNullOrEmpty(Model.Cast))
+                @if (!string.IsNullOrEmpty(Model.DienVien))
                 {
                     <div class="col-12">
                         <div class="text-muted small">Diễn viên</div>
-                        <div>@Model.Cast</div>
+                        <div>@Model.DienVien</div>
                     </div>
                 }
             </div>
 
-            @if (!string.IsNullOrEmpty(Model.Description))
+            @if (!string.IsNullOrEmpty(Model.MoTa))
             {
-                <p>@Model.Description</p>
+                <p>@Model.MoTa</p>
             }
 
-            @if (!string.IsNullOrEmpty(Model.TrailerUrl))
+            @if (!string.IsNullOrEmpty(Model.LinkTrailer))
             {
-                <a href="@Model.TrailerUrl" target="_blank" class="btn btn-outline-danger">
+                <a href="@Model.LinkTrailer" target="_blank" class="btn btn-outline-danger">
                     <i class="fab fa-youtube me-2"></i>Xem trailer
                 </a>
             }
@@ -98,7 +98,7 @@
     </div>
 
     <!-- Showtimes -->
-    @if (Model.Status == "NowShowing")
+    @if (Model.TrangThaiChieu == "NowShowing")
     {
         <div class="mb-4">
             <h4 class="fw-bold mb-3"><i class="fas fa-calendar me-2 text-danger"></i>Lịch chiếu</h4>
@@ -110,31 +110,31 @@
                 </div>
             </form>
 
-            @if (!Model.ShowtimeGroups.Any())
+            @if (!Model.NhomSuatChieus.Any())
             {
                 <div class="alert alert-info">Không có suất chiếu trong ngày này.</div>
             }
             else
             {
-                @foreach (var group in Model.ShowtimeGroups)
+                @foreach (var group in Model.NhomSuatChieus)
                 {
                     <div class="card mb-3">
                         <div class="card-header">
                             <i class="fas fa-building me-2 text-danger"></i>
-                            <strong>@group.CinemaName</strong>
-                            <span class="text-muted ms-2">@group.CinemaCity</span>
+                            <strong>@group.TenRap</strong>
+                            <span class="text-muted ms-2">@group.ThanhPho</span>
                         </div>
                         <div class="card-body">
                             <div class="d-flex flex-wrap gap-2">
-                                @foreach (var st in group.Showtimes)
+                                @foreach (var st in group.SuatChieus)
                                 {
-                                    var isAvailable = st.AvailableSeats > 0 && st.Status == "Scheduled";
+                                    var isAvailable = st.SoGheTrong > 0 && st.TrangThaiSuat == "Scheduled";
                                     <a asp-controller="Booking" asp-action="SeatSelection" asp-route-showtimeId="@st.Id"
                                        class="btn @(isAvailable ? "btn-outline-danger" : "btn-outline-secondary") showtime-btn"
-                                       title="@st.RoomName | @st.AvailableSeats/@st.TotalSeats ghế">
-                                        <div class="fw-bold">@st.StartTime.ToString("HH:mm")</div>
-                                        <div class="small">@st.Format • @st.SubType</div>
-                                        <div class="small">@st.BasePrice.ToString("N0")đ</div>
+                                       title="@st.TenPhong | @st.SoGheTrong/@st.TongSoGhe ghế">
+                                        <div class="fw-bold">@st.GioBatDau.ToString("HH:mm")</div>
+                                        <div class="small">@st.DinhDang • @st.PhongDich</div>
+                                        <div class="small">@st.GiaVeCoBan.ToString("N0")đ</div>
                                         @if (!isAvailable)
                                         {
                                             <div class="small text-muted">Hết ghế</div>
@@ -148,13 +148,13 @@
             }
         </div>
     }
-    else if (Model.Status == "ComingSoon")
+    else if (Model.TrangThaiChieu == "ComingSoon")
     {
         <div class="alert alert-warning">
             <i class="fas fa-clock me-2"></i>Phim sắp chiếu
-            @if (Model.ReleaseDate.HasValue)
+            @if (Model.NgayChieu.HasValue)
             {
-                <strong> từ ngày @Model.ReleaseDate.Value.ToString("dd/MM/yyyy")</strong>
+                <strong> từ ngày @Model.NgayChieu.Value.ToString("dd/MM/yyyy")</strong>
             }
         </div>
     }
@@ -168,7 +168,7 @@
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     if (confirm('Bạn cần đăng nhập để đặt vé. Đến trang đăng nhập?')) {
-                        window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                        window.location.href = '/tai-khoan/dang-nhap?returnUrl=' + encodeURIComponent(window.location.pathname);
                     }
                 });
             });

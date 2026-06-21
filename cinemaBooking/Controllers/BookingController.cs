@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace cinemaBooking.Controllers;
 
 [Authorize]
+[Route("dat-ve")]
 public class BookingController : Controller
 {
     private readonly IBookingService _bookingService;
@@ -19,6 +20,7 @@ public class BookingController : Controller
     }
 
     [HttpGet]
+    [Route("chon-ghe")]
     public async Task<IActionResult> SeatSelection(int showtimeId)
     {
         var vm = await _showtimeService.GetSeatSelectionAsync(showtimeId);
@@ -28,12 +30,13 @@ public class BookingController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("tao-don-hang")]
     public async Task<IActionResult> Create(CreateBookingViewModel model)
     {
-        if (!ModelState.IsValid || !model.SelectedSeatIds.Any())
+        if (!ModelState.IsValid || !model.DanhSachMaGheChon.Any())
         {
             TempData["Error"] = "Vui lòng chọn ít nhất 1 ghế.";
-            return RedirectToAction(nameof(SeatSelection), new { showtimeId = model.ShowtimeId });
+            return RedirectToAction(nameof(SeatSelection), new { showtimeId = model.MaSuatChieu });
         }
 
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -42,13 +45,14 @@ public class BookingController : Controller
         if (booking == null)
         {
             TempData["Error"] = "Đặt vé thất bại. Ghế đã được đặt hoặc không hợp lệ.";
-            return RedirectToAction(nameof(SeatSelection), new { showtimeId = model.ShowtimeId });
+            return RedirectToAction(nameof(SeatSelection), new { showtimeId = model.MaSuatChieu });
         }
 
-        return RedirectToAction(nameof(Confirmation), new { id = booking.BookingId });
+        return RedirectToAction(nameof(Confirmation), new { id = booking.MaDatVe });
     }
 
     [HttpGet]
+    [Route("xac-nhan/{id}")]
     public async Task<IActionResult> Confirmation(int id)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -59,6 +63,7 @@ public class BookingController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("thanh-toan/{id}")]
     public async Task<IActionResult> Pay(int id)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -73,6 +78,7 @@ public class BookingController : Controller
     }
 
     [HttpGet]
+    [Route("lich-su-dat-ve")]
     public async Task<IActionResult> History()
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -82,6 +88,7 @@ public class BookingController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("huy-ve/{id}")]
     public async Task<IActionResult> Cancel(int id)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
