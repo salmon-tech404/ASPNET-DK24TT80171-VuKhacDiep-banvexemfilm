@@ -9,6 +9,7 @@ Dự án ASP.NET Core 8 MVC quản lý và đặt vé xem phim trực tuyến.
 
 ## 1. Tổng Quan Hệ Thống
 
+Em xin chào quý Thầy/Cô, sau đây em xin giới thiệu về Hệ Thống Đặt Vé Xem Phim Trực Tuyến với tên gọi là Cinema Star.
 Cinema Star là ứng dụng web cho phép người dùng duyệt tìm danh sách phim, xem thông tin chi tiết và trailer phim, xem lịch chiếu, chọn ghế trực quan theo sơ đồ phòng chiếu thời gian thực và đặt vé trực tuyến. Hệ thống được thiết kế tối ưu và chia làm hai phân quyền chính: **Khách Hàng (Customer)** và **Quản Trị Viên (Admin)**.
 
 ### Tính năng chính:
